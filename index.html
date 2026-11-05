@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>んです</title>
+    <title>～んです變形練習</title>
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
     <style>
@@ -498,174 +498,131 @@
       [hidden] {
         display: none !important
       }
+    
+      /* Dictionary-form study table */
+      .study-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 22px 60px; }
+      .study-head { margin: 14px 0 24px; }
+      .study-head h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); }
+      .study-head p { color: var(--sub); margin: 8px 0 0; }
+      .study-panel { background: color-mix(in srgb, var(--card) 86%, transparent); border: 1px solid rgba(255,255,255,.8); border-radius: 20px; padding: 22px; box-shadow: 0 10px 32px rgba(80,100,110,.12); }
+      .category-tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+      .category-tabs .chip { border-radius:999px; }
+      .table-note { color:var(--sub); font-size:.92rem; margin:0 0 14px; }
+      .table-scroll { display:block; width:100%; max-width:100%; overflow-x:auto; overflow-y:hidden; border-radius:14px; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; touch-action:pan-x pan-y; scrollbar-width:thin; scrollbar-color:#9bb9aa transparent; }
+      .study-table { border-collapse:separate; border-spacing:0; table-layout:fixed; width:100%; min-width:890px; background:rgba(255,255,255,.5); }
+      .study-table col:first-child { width:170px; }
+      .study-table col:not(:first-child) { width:180px; }
+      .study-table th,.study-table td { padding:12px 10px; text-align:center; border-right:1px solid var(--line); border-bottom:1px solid var(--line); }
+      .study-table th { background:rgba(220,235,228,.72); font-weight:700; white-space:normal; line-height:1.35; position:sticky; top:0; z-index:2; }
+      .study-table th:first-child,.study-table td:first-child { position:sticky; left:0; z-index:1; background:rgba(248,251,248,.97); text-align:left; min-width:150px; }
+      .study-table th:first-child { z-index:2; background:#e1eee8; }
+      .study-table tr:first-child th { border-top:1px solid var(--line); }
+      .study-table th:first-child,.study-table td:first-child { border-left:1px solid var(--line); }
+      .cell-button { border:0; background:transparent; color:var(--ink); font:inherit; cursor:pointer; padding:5px 7px; border-radius:8px; min-width:112px; }
+      .cell-button:hover { background:rgba(215,233,225,.7); }
+      .cell-button .masked { color:#84938b; letter-spacing:.08em; }
+      .speaker { border:0; background:transparent; color:var(--indigo); font:inherit; cursor:pointer; padding:4px 7px; margin-left:3px; }
+      .row-word { display:inline; }
+      .empty-state { padding:28px; text-align:center; color:var(--sub); }
+      @media(max-width:600px) { .study-wrap{padding:18px 12px 34px}.study-panel{padding:15px 12px}.study-table{min-width:794px}.study-table col:first-child{width:138px}.study-table col:not(:first-child){width:164px}.study-table th,.study-table td{padding:10px 7px;font-size:.92rem}.cell-button{min-width:0;width:100%;padding:8px 3px;overflow-wrap:anywhere}.speaker{padding:6px 3px}.study-head p{font-size:.95rem} }
     </style>
   </head>
 
-  <body>
-    <main>
-      <section id="home">
-        <h1>んです變化練習</h1>
-        <p class="lead">看到です／ます形，打出指定的變化。平假名或漢字都可以。</p>
-        <div class="chips" id="modes" role="group" aria-label="練習範圍">
-          <button class="chip" data-m="v" aria-pressed="false">A｜動詞</button>
-          <button class="chip" data-m="a" aria-pressed="false">B｜形容詞</button>
-          <button class="chip" data-m="balanced" aria-pressed="true">平均混合</button>
-          <button class="chip" data-m="sequence" aria-pressed="false">A → B</button>
-        </div>
-        <p class="lead" id="modeHint">動詞 5 題＋形容詞 5 題，交錯練習。</p>
-        <button class="btn" id="start">開始（10題）</button>
-      </section>
-
-      <section id="play" hidden>
-        <div class="hud"><span id="no"></span><span id="sc"></span></div>
-        <div class="bar"><i id="pg"></i></div>
-        <div class="card" id="card">
-          <div class="stamp" id="stamp"></div>
-          <p class="word" id="w"></p>
-          <p class="kana" id="k"></p>
-          <p class="mean" id="m"></p>
-          <p class="target" id="t"></p>
-          <form class="row" id="answerForm">
-            <input type="text" id="in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="答案"
-              placeholder="">
-            <button class="btn" id="go" type="submit">送出</button>
-          </form>
-          <div class="fb" id="fb">
-            <p class="ans" id="fa"></p>
-            <p class="rule" id="fr"></p>
-            <button class="btn" id="next" type="button">下一題</button>
-          </div>
-        </div>
-      </section>
-
-      <section id="end" hidden>
-        <h1>結果</h1>
-        <p class="big" id="fs"></p>
-        <p class="lead" id="fm"></p>
-        <ul class="rev" id="rev"></ul>
-        <button class="btn" id="again">再玩一次</button>
-        <button class="btn ghost" id="menu">回選單</button>
+    <body>
+    <main class="study-wrap">
+      <header class="study-head">
+        <h1>～んです 變形練習</h1>
+        <p>先看辭書形並聽發音，再點選下方變形揭曉答案。每個答案都能再次播放。</p>
+      </header>
+      <section class="study-panel" aria-label="～んです變形表">
+        <nav class="category-tabs" id="categories" role="tablist" aria-label="文法類別"></nav>
+        <p class="table-note">進入類別時會播放第一個辭書形。點擊變形欄位可揭曉並播放發音；手機請在表格上左右滑動，查看右側欄位。</p>
+        <div class="table-scroll"><table class="study-table">
+          <colgroup><col><col><col><col><col></colgroup><thead><tr><th scope="col">辭書形</th><th scope="col">～んです</th><th scope="col">～ないんです</th><th scope="col">～たんです</th><th scope="col">～なかったんです</th></tr></thead>
+          <tbody id="tableRows"></tbody>
+        </table></div>
       </section>
     </main>
     <script>
       (function () {
-        var A = { 'う': 'わ', 'く': 'か', 'ぐ': 'が', 'す': 'さ', 'つ': 'た', 'ぬ': 'な', 'ぶ': 'ば', 'む': 'ま', 'る': 'ら' };
-        var I = { 'う': 'い', 'く': 'き', 'ぐ': 'ぎ', 'す': 'し', 'つ': 'ち', 'ぬ': 'に', 'ぶ': 'び', 'む': 'み', 'る': 'り' };
-        var T = { 'う': 'った', 'つ': 'った', 'る': 'った', 'む': 'んだ', 'ぶ': 'んだ', 'ぬ': 'んだ', 'く': 'いた', 'ぐ': 'いだ', 'す': 'した' };
-        // t: g=五段, i=一段, x=不規則, ia=い形容詞, na=な形容詞; k=漢字, n=被漢字取代的假名數
-        var V = [
-          { d: 'いく', k: '行', n: 1, t: 'g', m: '去' }, { d: 'かえる', k: '帰', n: 2, t: 'g', m: '回去、回家' }, { d: 'およぐ', k: '泳', n: 2, t: 'g', m: '游泳' },
-          { d: 'のむ', k: '飲', n: 1, t: 'g', m: '喝' }, { d: 'かく', k: '書', n: 1, t: 'g', m: '寫' }, { d: 'まつ', k: '待', n: 1, t: 'g', m: '等' },
-          { d: 'あそぶ', k: '遊', n: 2, t: 'g', m: '玩' }, { d: 'きく', k: '聞', n: 1, t: 'g', m: '聽、問' }, { d: 'はなす', k: '話', n: 2, t: 'g', m: '說話' },
-          { d: 'あう', k: '会', n: 1, t: 'g', m: '見面' }, { d: 'ある', k: '', n: 0, t: 'g', m: '有（物品）' }, { d: 'いる', k: '', n: 0, t: 'i', m: '在、有（人或動物）' },
-          { d: 'みる', k: '見', n: 1, t: 'i', m: '看' }, { d: 'ねる', k: '寝', n: 1, t: 'i', m: '睡覺' }, { d: 'たべる', k: '食', n: 1, t: 'i', m: '吃' },
-          { d: 'する', k: '', n: 0, t: 'x', m: '做' }, { d: 'くる', k: '来', n: 1, t: 'x', m: '來' }];
-        var J = [
-          { d: 'ほしい', k: '', n: 0, t: 'ia', m: '想要（物品）' }, { d: 'たべたい', k: '食', n: 1, t: 'ia', m: '想吃' }, { d: 'いい', k: '', n: 0, t: 'ia', m: '好' },
-          { d: 'ちいさい', k: '小', n: 2, t: 'ia', m: '小的' }, { d: 'きれい', k: '綺麗', n: 3, t: 'na', m: '漂亮、乾淨' }, { d: 'しずか', k: '静', n: 2, t: 'na', m: '安靜' },
-          { d: 'ひま', k: '暇', n: 2, t: 'na', m: '有空' }];
-        var FL = ['～んです', '～ないんです', '～たんです', '～なかったんです'];
-
-        function forms(o) {
-          var d = o.d, s = d.slice(0, -1), e = d.slice(-1), f;
-          if (o.t === 'g') {
-            var nai = d === 'ある' ? 'ない' : s + A[e] + 'ない'; var ta = d === 'いく' ? 'いった' : s + T[e];
-            f = [d, nai, ta, nai.slice(0, -1) + 'かった', s + I[e] + 'ます'];
-          }
-          else if (o.t === 'i') { f = [d, s + 'ない', s + 'た', s + 'なかった', s + 'ます']; }
-          else if (o.t === 'x') { f = d === 'する' ? ['する', 'しない', 'した', 'しなかった', 'します'] : ['くる', 'こない', 'きた', 'こなかった', 'きます']; }
-          else if (o.t === 'ia') { var b = d === 'いい' ? 'よ' : s; f = [d, b + 'くない', b + 'かった', b + 'くなかった', d + 'です']; }
-          else { f = [d + 'な', d + 'じゃない', d + 'だった', d + 'じゃなかった', d + 'です']; }
-          return f;
+        var groups = [
+          { id:'verb', label:'動詞', rows:[
+            ['行きます','行く','行かない','行った','行かなかった','いきます','いく'],
+            ['帰（かえ）ります','帰る','帰らない','帰った','帰らなかった','かえります','かえる'],
+            ['見（み）ます','みる','みない','みた','みなかった','みます','みる'],
+            ['泳（およ）ぎます','およぐ','およがない','およいだ','およがなかった','およぎます','およぐ'],
+            ['飲（の）みます','のむ','のまない','のんだ','のまなかった','のみます','のむ'],
+            ['書（か）きます','かく','かかない','かいた','かかなかった','かきます','かく'],
+            ['います','いる','いない','いた','いなかった','います','いる'],
+            ['待（ま）ちます','まつ','またない','まった','またなかった','まちます','まつ'],
+            ['寝（ね）ます','ねる','ねない','ねた','ねなかった','ねます','ねる'],
+            ['遊（あそ）びます','あそぶ','あそばない','あそんだ','あそばなかった','あそびます','あそぶ'],
+            ['聞（き）きます','きく','きかない','きいた','きかなかった','ききます','きく'],
+            ['食（た）べます','たべる','たべない','たべた','たべなかった','たべます','たべる'],
+            ['話（はな）します','はなす','はなさない','はなした','はなさなかった','はなします','はなす'],
+            ['会（あ）います','あう','あわない','あった','あわなかった','あいます','あう'],
+            ['します','する','しない','した','しなかった','します','する'],
+            ['来（き）ます','くる','こない','きた','こなかった','きます','くる']
+          ]},
+          { id:'special', label:'あります・特例', rows:[['あります','ある','ない','あった','なかった','あります','ある']] },
+          { id:'iadj', label:'い形容詞', rows:[
+            ['ほしいです','ほしい','ほしくない','ほしかった','ほしくなかった','ほしいです','ほしい'],
+            ['食（た）べたいです','たべたい','たべたくない','たべたかった','たべたくなかった','たべたいです','たべたい'],
+            ['いいです','いい','よくない','よかった','よくなかった','いいです','いい'],
+            ['小さいです','ちいさい','ちいさくない','ちいさかった','ちいさくなかった','ちいさいです','ちいさい']
+          ]},
+          { id:'naadj', label:'な形容詞', rows:[
+            ['綺麗（きれい）です','きれい','きれいじゃない','きれいだった','きれいじゃなかった','きれいです','きれい'],
+            ['静かです','しずか','しずかじゃない','しずかだった','しずかじゃなかった','しずかです','しずか'],
+            ['暇（ひま）です','ひま','ひまじゃない','ひまだった','ひまじゃなかった','ひまです','ひま']
+          ]}
+        ];
+        var active = groups[0];
+        function speak(text) {
+          if (!('speechSynthesis' in window)) return;
+          window.speechSynthesis.cancel();
+          var utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'ja-JP'; utterance.rate = 0.88;
+          window.speechSynthesis.speak(utterance);
         }
-        function kj(o, x) { return o.k ? o.k + x.slice(o.n) : x; }
-        function rule(o, i) {
-          var d = o.d, e = d.slice(-1);
-          if (i === 0) return o.t === 'na' ? 'な形容詞：名詞修飾形（～な）＋んです' : o.t === 'ia' ? 'い形容詞：普通形直接＋んです' : '普通形（辭書形）＋んです';
-          if (o.t === 'g') {
-            if (i === 1) return d === 'ある' ? 'ある的否定是特例：ない（不是あらない）' : '五段動詞：語尾' + e + '→' + A[e] + '＋ない';
-            if (i === 2) return d === 'いく' ? '行く是特例：行った（不是行いた）' : '五段動詞：語尾' + e + '→' + T[e];
-            return '先做ない形，再把い換成かった';
-          }
-          if (o.t === 'i') return i === 1 ? '一段動詞：去掉る＋ない' : i === 2 ? '一段動詞：去掉る＋た' : '一段動詞：去掉る＋なかった';
-          if (o.t === 'x') return o.d === 'する' ? 'する是不規則動詞：しない／した／しなかった' : '来る是不規則動詞：こない／きた／こなかった';
-          if (o.t === 'ia') { var y = d === 'いい' ? 'いい要變成よい系：よ＋' : '去掉い＋'; return y + (i === 1 ? 'くない' : i === 2 ? 'かった' : 'くなかった'); }
-          return i === 1 ? 'な形容詞：＋じゃない' : i === 2 ? 'な形容詞：＋だった' : 'な形容詞：＋じゃなかった';
-        }
-        function norm(s) { return s.replace(/[\s\u3000]/g, '').replace(/[Ａ-Ｚａ-ｚ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0) }); }
-
-        var $ = function (i) { return document.getElementById(i) };
-        var mode = 'balanced', Q = [], qi = 0, score = 0, streak = 0, wrong = [], locked = false;
-        function show(id) { ['home', 'play', 'end'].forEach(function (x) { $(x).hidden = x !== id }); }
-        function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-        function makeQuestions(pool, count) {
-          var all = [];
-          pool.forEach(function (o) {
-            for (var i = 0; i < 4; i++) all.push({ o: o, i: i });
+        function speakThen(dictionaryForm, conjugatedForm) {
+          if (!('speechSynthesis' in window)) return;
+          window.speechSynthesis.cancel();
+          [dictionaryForm, conjugatedForm].forEach(function (text) {
+            var utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP'; utterance.rate = 0.88;
+            window.speechSynthesis.speak(utterance);
           });
-          return shuffle(all).slice(0, count);
         }
-        function build() {
-          if (mode === 'v') {
-            Q = makeQuestions(V, 10);
-          } else if (mode === 'a') {
-            Q = makeQuestions(J, 10);
-          } else {
-            var verbQs = makeQuestions(V, 5);
-            var adjQs = makeQuestions(J, 5);
-            // 平均混合：兩區各五題後打散；A→B：先完成動詞再做形容詞
-            Q = mode === 'sequence' ? verbQs.concat(adjQs) : shuffle(verbQs.concat(adjQs));
-          }
+        function button(text, label, handler, extra) {
+          var b=document.createElement('button'); b.type='button'; b.className=extra||'cell-button'; b.setAttribute('aria-label',label); if (typeof handler === 'function') b.addEventListener('click',handler); return b;
+        }
+        function renderTabs() {
+          var nav=document.getElementById('categories'); nav.innerHTML='';
+          groups.forEach(function(g) {
+            var b=button(g.label,g.label,function(){active=g; render(); if(g.rows.length) speak(g.rows[0][6]);},'chip');
+            b.setAttribute('role','tab'); b.setAttribute('aria-selected',g===active?'true':'false'); b.setAttribute('aria-pressed',g===active?'true':'false'); nav.appendChild(b);
+          });
         }
         function render() {
-          var q = Q[qi], o = q.o, f = forms(o); locked = false;
-          var sectionLabel = V.indexOf(o) !== -1 ? 'A 區塊｜動詞' : 'B 區塊｜形容詞';
-          $('no').textContent = ((mode === 'sequence' || mode === 'balanced') ? sectionLabel + '　' : '') + '第 ' + (qi + 1) + ' 題／' + Q.length; $('sc').textContent = '得分 ' + score + (streak > 1 ? '　連對 ' + streak : '');
-          $('pg').style.width = (qi / Q.length * 100) + '%';
-          var m = kj(o, f[4]); $('w').textContent = m; $('k').textContent = m !== f[4] ? f[4] : '';
-          $('m').textContent = o.m;
-          $('t').innerHTML = '變成 <b>' + FL[q.i] + '</b>';
-          $('in').value = ''; $('in').disabled = false; $('go').disabled = false;
-          $('fb').classList.remove('show'); $('stamp').className = 'stamp';
-          $('in').focus();
-        }
-        function submit() {
-          if (locked) return; var q = Q[qi], o = q.o, f = forms(o), a = f[q.i] + 'んです', ka = kj(o, f[q.i]) + 'んです';
-          var v = norm($('in').value); if (!v) return; locked = true;
-          var ok = v === a || v === ka; var st = $('stamp');
-          if (ok) { streak++; score += 10 + Math.min(streak - 1, 5) * 2; st.textContent = '正解'; st.className = 'stamp ok show'; }
-          else { streak = 0; wrong.push({ o: o, i: q.i, mine: v, ans: ka, kana: a }); st.textContent = '違う'; st.className = 'stamp show'; $('card').classList.remove('shake'); void $('card').offsetWidth; $('card').classList.add('shake'); }
-          $('sc').textContent = '得分 ' + score + (streak > 1 ? '　連對 ' + streak : '');
-          $('fa').textContent = ka !== a ? ka + '（' + a + '）' : a;
-          $('fr').textContent = rule(o, q.i);
-          $('next').textContent = qi === Q.length - 1 ? '看結果' : (mode === 'sequence' && qi === 4 ? '進入 B 區塊' : '下一題');
-          $('fb').classList.add('show'); $('in').disabled = true; $('go').disabled = true; $('next').focus();
-        }
-        function next() { if (!locked) return; if (qi === Q.length - 1) return finish(); qi++; render(); }
-        function finish() {
-          show('end');
-          var c = Q.length - wrong.length; $('fs').textContent = c + ' / ' + Q.length;
-          $('fm').textContent = c === 10 ? '全對！變化已經很穩了。' : c >= 7 ? '很不錯，看看下面錯的題目就更完整了。' : '再玩一次，規則會越來越熟。';
-          var L = $('rev'); L.innerHTML = '';
-          if (!wrong.length) { L.innerHTML = '<li>沒有錯題 🎉</li>'; }
-          wrong.forEach(function (w) {
-            var li = document.createElement('li');
-            var b = document.createElement('span'); b.textContent = kj(w.o, forms(w.o)[4]) + ' → ' + FL[w.i] + '：' + w.ans;
-            var s = document.createElement('small'); s.textContent = '你的答案：' + w.mine + '　' + rule(w.o, w.i);
-            li.appendChild(b); li.appendChild(s); L.appendChild(li);
+          renderTabs(); var tbody=document.getElementById('tableRows'); tbody.innerHTML='';
+          active.rows.forEach(function(row) {
+            var tr=document.createElement('tr'), base=document.createElement('td');
+            var word=document.createElement('span'); word.className='row-word'; word.textContent=row[6]; base.appendChild(word);
+            var audio=button('🔊','播放 '+row[6],function(){speak(row[6]);},'speaker'); base.appendChild(audio); tr.appendChild(base);
+            for(var i=1;i<=4;i++) {
+              var td=document.createElement('td'), form=row[i]+'んです';
+              var cell=button('','','', 'cell-button');
+              cell.setAttribute('aria-label','顯示並播放變形'); cell.innerHTML='<span class="masked">點一下顯示</span>';
+              cell.addEventListener('click',function(target,btn){return function(){btn.textContent=target; btn.setAttribute('aria-label','播放 '+target); btn.onclick=function(){speak(target);}; speakThen(row[6], target);};}(form,cell));
+              td.appendChild(cell); tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
           });
         }
-        function start() { build(); qi = 0; score = 0; streak = 0; wrong = []; show('play'); render(); }
-
-        document.querySelectorAll('.chip').forEach(function (c) {
-          c.addEventListener('click', function () {
-            mode = c.dataset.m; document.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false') });
-            $('modeHint').textContent = mode === 'v' ? '只練習 A 區塊：動詞 10 題。' : mode === 'a' ? '只練習 B 區塊：形容詞 10 題。' : mode === 'sequence' ? '先完成 A 區塊動詞 5 題，再接著練習 B 區塊形容詞 5 題。' : '動詞 5 題＋形容詞 5 題，交錯練習。';
-          });
-        });
-        $('start').onclick = start; $('again').onclick = start; $('menu').onclick = function () { show('home') };
-        $('answerForm').addEventListener('submit', function (e) { e.preventDefault(); submit(); });
-        $('next').onclick = next;
+        render();
+        // The initial category is a user gesture; speak its first dictionary form on entry.
+        speak(active.rows[0][6]);
       })();
     </script>
   </body>
