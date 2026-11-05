@@ -15,6 +15,10 @@
   var reviewView = document.getElementById('review-view');
   var heading = document.getElementById('review-heading');
   var content = document.getElementById('review-content');
+  var conjugationPanel = document.getElementById('conjugation-panel');
+  var conjugationContent = document.getElementById('conjugation-content');
+  var ndesuPanel = document.querySelector('#ndesu-view > .study-panel');
+  var studyHeading = document.getElementById('study-heading');
 
   function element(tag, className, text) {
     var node = document.createElement(tag);
@@ -55,6 +59,21 @@
   nav.addEventListener('click', function (event) {
     var button = event.target.closest('[data-app-page]');
     if (button) { session = null; selectedPattern = null; setPage(button.dataset.appPage); }
+  });
+
+  document.getElementById('study-modes').addEventListener('click', function (event) {
+    var button = event.target.closest('[data-study-mode]');
+    if (!button) return;
+    var conjugationMode = button.dataset.studyMode === 'conjugation';
+    ndesuPanel.hidden = conjugationMode;
+    conjugationPanel.hidden = !conjugationMode;
+    studyHeading.textContent = conjugationMode ? '動詞變形練習' : '～んです 變形練習';
+    document.querySelectorAll('[data-study-mode]').forEach(function (tab) {
+      var active = tab === button;
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      tab.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    if (conjugationMode) renderConjugation();
   });
 
   function renderGrammar() {
@@ -162,47 +181,51 @@
     button.addEventListener('click', handler); return button;
   }
   function renderConjugation() {
-    heading.textContent = '動詞變形'; content.innerHTML = '';
-    var kinds = [
-      { id: 'te', label: 'て形' }, { id: 'ta', label: 'た形' }, { id: 'nai', label: 'ない形' }, { id: 'masu', label: 'ます形' }
-    ];
-    var tabs = element('div', 'review-categories');
-    kinds.forEach(function (kind) {
-      var button = action(kind.label, function () { selectedConjugation = kind.id; renderConjugation(); }, 'chip');
-      button.setAttribute('aria-pressed', selectedConjugation === kind.id ? 'true' : 'false');
-      tabs.appendChild(button);
-    });
-    content.appendChild(tabs);
-    var selected = kinds.filter(function (kind) { return kind.id === selectedConjugation; })[0] || kinds[0];
+    conjugationContent.innerHTML = '';
     var tableWrap = element('div', 'table-scroll');
-    var table = element('table', 'conjugation-table');
-    var colgroup = document.createElement('colgroup'); colgroup.appendChild(document.createElement('col')); colgroup.appendChild(document.createElement('col')); table.appendChild(colgroup);
+    var table = element('table', 'study-table');
+    var colgroup = document.createElement('colgroup');
+    for (var col = 0; col < 5; col++) colgroup.appendChild(document.createElement('col'));
+    table.appendChild(colgroup);
+    var forms = [
+      { id: 'te', label: 'て形' }, { id: 'ta', label: 'た形' },
+      { id: 'nai', label: 'ない形' }, { id: 'masu', label: 'ます形' }
+    ];
     var thead = document.createElement('thead'), header = document.createElement('tr');
     var dictionaryHeader = document.createElement('th'); dictionaryHeader.scope = 'col'; dictionaryHeader.appendChild(document.createTextNode('辭書形'));
     dictionaryHeader.appendChild(speakerButton('朗讀辭書形整欄', function () { speakJapaneseList(grammar.verbConjugations.map(function (row) { return row.reading; })); }, 'column-speaker'));
-    var formHeader = document.createElement('th'); formHeader.scope = 'col'; formHeader.appendChild(document.createTextNode(selected.label));
-    formHeader.appendChild(speakerButton('朗讀' + selected.label + '整欄', function () {
-      var readings = [];
-      grammar.verbConjugations.forEach(function (row) { readings.push(row.reading, row.forms[selectedConjugation][1]); });
-      speakJapaneseList(readings);
-    }, 'column-speaker'));
-    header.appendChild(dictionaryHeader); header.appendChild(formHeader); thead.appendChild(header); table.appendChild(thead);
+    header.appendChild(dictionaryHeader);
+    forms.forEach(function (kind) {
+      var th = document.createElement('th'); th.scope = 'col'; th.appendChild(document.createTextNode(kind.label));
+      th.appendChild(speakerButton('朗讀' + kind.label + '整欄', function () {
+        var readings = [];
+        grammar.verbConjugations.forEach(function (row) { readings.push(row.reading, row.forms[kind.id][1]); });
+        speakJapaneseList(readings);
+      }, 'column-speaker'));
+      header.appendChild(th);
+    });
+    thead.appendChild(header); table.appendChild(thead);
     var tbody = document.createElement('tbody');
     grammar.verbConjugations.forEach(function (row) {
-      var tr = document.createElement('tr'), dictionaryCell = document.createElement('td');
-      dictionaryCell.appendChild(element('span', 'row-word', row.dictionary));
-      dictionaryCell.appendChild(speakerButton('播放' + row.dictionary, function () { speakJapaneseList([row.reading]); }));
-      tr.appendChild(dictionaryCell);
-      var formCell = document.createElement('td'), answer = row.forms[selectedConjugation];
-      var reveal = action('點一下顯示', function () {
-        if (reveal.dataset.revealed === 'true') { speakJapaneseList([answer[1]]); return; }
-        reveal.dataset.revealed = 'true'; reveal.textContent = answer[0]; reveal.setAttribute('aria-label', '播放' + answer[0]);
-        speakJapaneseList([row.reading, answer[1]]);
-      }, 'cell-button');
-      reveal.setAttribute('aria-label', '顯示並播放' + selected.label);
-      formCell.appendChild(reveal); tr.appendChild(formCell); tbody.appendChild(tr);
+      var tr = document.createElement('tr'), base = document.createElement('td');
+      base.appendChild(element('span', 'row-word', row.dictionary));
+      base.appendChild(speakerButton('播放' + row.dictionary, function () { speakJapaneseList([row.reading]); }));
+      tr.appendChild(base);
+      forms.forEach(function (kind) {
+        var td = document.createElement('td'), answer = row.forms[kind.id];
+        var reveal = action('', function () {
+          if (reveal.dataset.revealed === 'true') { speakJapaneseList([answer[1]]); return; }
+          reveal.dataset.revealed = 'true'; reveal.textContent = answer[0];
+          reveal.setAttribute('aria-label', '播放' + answer[0]);
+          speakJapaneseList([row.reading, answer[1]]);
+        }, 'cell-button');
+        reveal.innerHTML = '<span class="masked">點一下顯示</span>';
+        reveal.setAttribute('aria-label', '顯示並播放' + kind.label);
+        td.appendChild(reveal); tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
     });
-    table.appendChild(tbody); tableWrap.appendChild(table); content.appendChild(tableWrap);
+    table.appendChild(tbody); tableWrap.appendChild(table); conjugationContent.appendChild(tableWrap);
   }
 
   function renderExerciseSetup() {
