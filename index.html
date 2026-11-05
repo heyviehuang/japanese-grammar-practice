@@ -505,8 +505,9 @@
       .study-head h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); }
       .study-head p { color: var(--sub); margin: 8px 0 0; }
       .study-panel { background: color-mix(in srgb, var(--card) 86%, transparent); border: 1px solid rgba(255,255,255,.8); border-radius: 20px; padding: 22px; box-shadow: 0 10px 32px rgba(80,100,110,.12); }
+      .category-title { font-size:1.05rem; margin:0 0 10px; color:var(--ink); }
       .category-tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
-      .category-tabs .chip { border-radius:999px; }
+      .category-tabs .chip { border-radius:999px; color:#344b40; font-weight:700; font-size:.88rem; padding-top:6px; padding-bottom:6px; white-space:nowrap; }
       .table-note { color:var(--sub); font-size:.92rem; margin:0 0 14px; }
       .table-scroll { display:block; width:100%; max-width:100%; overflow-x:auto; overflow-y:hidden; border-radius:14px; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; touch-action:pan-x pan-y; scrollbar-width:thin; scrollbar-color:#9bb9aa transparent; }
       .study-table { border-collapse:separate; border-spacing:0; table-layout:fixed; width:100%; min-width:890px; background:rgba(255,255,255,.5); }
@@ -514,14 +515,20 @@
       .study-table col:not(:first-child) { width:180px; }
       .study-table th,.study-table td { padding:12px 10px; text-align:center; border-right:1px solid var(--line); border-bottom:1px solid var(--line); }
       .study-table th { background:rgba(220,235,228,.72); font-weight:700; white-space:normal; line-height:1.35; position:sticky; top:0; z-index:2; }
-      .study-table th:first-child,.study-table td:first-child { position:sticky; left:0; z-index:1; background:rgba(248,251,248,.97); text-align:left; min-width:150px; }
-      .study-table th:first-child { z-index:2; background:#e1eee8; }
+      .study-table th:first-child,.study-table td:first-child { position:sticky; left:0; z-index:1; background:rgba(248,251,248,.97); text-align:center; min-width:150px; }
+      .study-table th:first-child { z-index:5; position:sticky; left:0; background:#e1eee8; }
+      .study-table td:first-child { z-index:3; }
       .study-table tr:first-child th { border-top:1px solid var(--line); }
       .study-table th:first-child,.study-table td:first-child { border-left:1px solid var(--line); }
       .cell-button { border:0; background:transparent; color:var(--ink); font:inherit; cursor:pointer; padding:5px 7px; border-radius:8px; min-width:112px; }
       .cell-button:hover { background:rgba(215,233,225,.7); }
       .cell-button .masked { color:#84938b; letter-spacing:.08em; }
-      .speaker { border:0; background:transparent; color:var(--indigo); font:inherit; cursor:pointer; padding:4px 7px; margin-left:3px; }
+      .speaker,.column-speaker { border:0; background:transparent; color:var(--indigo); font:inherit; cursor:pointer; padding:4px 7px; margin-left:3px; border-radius:8px; }
+      .study-table td:first-child { position:sticky; }
+      .study-table td:first-child .row-word { display:block; text-align:center; }
+      .study-table td:first-child .speaker { position:absolute; right:5px; top:50%; transform:translateY(-50%); margin:0; }
+      .column-speaker { display:block; margin:3px auto 0; font-size:.92rem; }
+      .speaker:hover,.column-speaker:hover { background:rgba(215,233,225,.7); }
       .row-word { display:inline; }
       .empty-state { padding:28px; text-align:center; color:var(--sub); }
       @media(max-width:600px) { .study-wrap{padding:18px 12px 34px}.study-panel{padding:15px 12px}.study-table{min-width:794px}.study-table col:first-child{width:138px}.study-table col:not(:first-child){width:164px}.study-table th,.study-table td{padding:10px 7px;font-size:.92rem}.cell-button{min-width:0;width:100%;padding:8px 3px;overflow-wrap:anywhere}.speaker{padding:6px 3px}.study-head p{font-size:.95rem} }
@@ -532,13 +539,13 @@
     <main class="study-wrap">
       <header class="study-head">
         <h1>～んです 變形練習</h1>
-        <p>先看辭書形並聽發音，再點選下方變形揭曉答案。每個答案都能再次播放。</p>
+        
       </header>
       <section class="study-panel" aria-label="～んです變形表">
         <nav class="category-tabs" id="categories" role="tablist" aria-label="文法類別"></nav>
-        <p class="table-note">進入類別時會播放第一個辭書形。點擊變形欄位可揭曉並播放發音；手機請在表格上左右滑動，查看右側欄位。</p>
+        
         <div class="table-scroll"><table class="study-table">
-          <colgroup><col><col><col><col><col></colgroup><thead><tr><th scope="col">辭書形</th><th scope="col">～んです</th><th scope="col">～ないんです</th><th scope="col">～たんです</th><th scope="col">～なかったんです</th></tr></thead>
+          <colgroup><col><col><col><col><col></colgroup><thead><tr><th scope="col">辭書形<button class="column-speaker" type="button" data-column="0" aria-label="朗讀辭書形整欄">🔊</button></th><th scope="col">～んです<button class="column-speaker" type="button" data-column="1" aria-label="朗讀～んです整欄">🔊</button></th><th scope="col">～ないんです<button class="column-speaker" type="button" data-column="2" aria-label="朗讀～ないんです整欄">🔊</button></th><th scope="col">～たんです<button class="column-speaker" type="button" data-column="3" aria-label="朗讀～たんです整欄">🔊</button></th><th scope="col">～なかったんです<button class="column-speaker" type="button" data-column="4" aria-label="朗讀～なかったんです整欄">🔊</button></th></tr></thead>
           <tbody id="tableRows"></tbody>
         </table></div>
       </section>
@@ -578,29 +585,42 @@
           ]}
         ];
         var active = groups[0];
+        function japaneseUtterance(text) {
+          var utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'ja-JP'; utterance.rate = 0.94; utterance.pitch = 1;
+          var voices = window.speechSynthesis.getVoices();
+          var japaneseVoices = voices.filter(function (voice) { return /^ja(-|$)/i.test(voice.lang); });
+          japaneseVoices.sort(function (a, b) {
+            var score = function (voice) { return (voice.lang.toLowerCase() === 'ja-jp' ? 2 : 0) + (voice.localService ? 1 : 0); };
+            return score(b) - score(a);
+          });
+          if (japaneseVoices.length) utterance.voice = japaneseVoices[0];
+          return utterance;
+        }
         function speak(text) {
           if (!('speechSynthesis' in window)) return;
           window.speechSynthesis.cancel();
-          var utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'ja-JP'; utterance.rate = 0.88;
-          window.speechSynthesis.speak(utterance);
+          window.speechSynthesis.speak(japaneseUtterance(text));
+        }
+        function speakList(items) {
+          if (!('speechSynthesis' in window) || !items.length) return;
+          window.speechSynthesis.cancel();
+          items.forEach(function (text) { window.speechSynthesis.speak(japaneseUtterance(text)); });
         }
         function speakThen(dictionaryForm, conjugatedForm) {
           if (!('speechSynthesis' in window)) return;
           window.speechSynthesis.cancel();
           [dictionaryForm, conjugatedForm].forEach(function (text) {
-            var utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ja-JP'; utterance.rate = 0.88;
-            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.speak(japaneseUtterance(text));
           });
         }
         function button(text, label, handler, extra) {
-          var b=document.createElement('button'); b.type='button'; b.className=extra||'cell-button'; b.setAttribute('aria-label',label); if (typeof handler === 'function') b.addEventListener('click',handler); return b;
+          var b=document.createElement('button'); b.type='button'; b.textContent=text; b.className=extra||'cell-button'; b.setAttribute('aria-label',label); if (typeof handler === 'function') b.addEventListener('click',handler); return b;
         }
         function renderTabs() {
           var nav=document.getElementById('categories'); nav.innerHTML='';
           groups.forEach(function(g) {
-            var b=button(g.label,g.label,function(){active=g; render(); if(g.rows.length) speak(g.rows[0][6]);},'chip');
+            var b=button(g.label,g.label,function(){active=g; render();},'chip');
             b.setAttribute('role','tab'); b.setAttribute('aria-selected',g===active?'true':'false'); b.setAttribute('aria-pressed',g===active?'true':'false'); nav.appendChild(b);
           });
         }
@@ -620,9 +640,18 @@
             tbody.appendChild(tr);
           });
         }
+        document.querySelectorAll('.column-speaker').forEach(function (control) {
+          control.addEventListener('click', function () {
+            var column = Number(control.dataset.column);
+            var items = [];
+            active.rows.forEach(function (row) {
+              if (column === 0) items.push(row[6]);
+              else items.push(row[6], row[column] + 'んです');
+            });
+            speakList(items);
+          });
+        });
         render();
-        // The initial category is a user gesture; speak its first dictionary form on entry.
-        speak(active.rows[0][6]);
       })();
     </script>
   </body>
