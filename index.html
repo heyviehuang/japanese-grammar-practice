@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>～んです變形練習</title>
+    <title>日文文法複習系統</title>
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
     <style>
@@ -534,12 +534,84 @@
       .speaker svg,.column-speaker svg { display:block; width:18px; height:18px; }
       .row-word { display:inline; }
       .empty-state { padding:28px; text-align:center; color:var(--sub); }
-      @media(max-width:600px) { .study-wrap{padding:18px 12px 34px}.study-panel{padding:15px 12px}.category-tabs{gap:6px}.category-tabs .chip{font-size:.78rem;padding-left:8px;padding-right:8px}.study-table{min-width:794px}.study-table col:first-child{width:138px}.study-table col:not(:first-child){width:164px}.study-table th,.study-table td{padding:10px 7px;font-size:.92rem}.cell-button{min-width:0;width:100%;padding:8px 3px;overflow-wrap:anywhere}.speaker{padding:6px 3px}.study-head p{font-size:.95rem} }
+      .app-nav-shell { max-width:1100px; margin:0 auto; padding:16px 22px 0; }
+      .app-navigation { display:flex; gap:8px; overflow-x:auto; white-space:nowrap; padding:4px 2px 9px; -webkit-overflow-scrolling:touch; scrollbar-width:thin; }
+      .app-navigation .nav-link { flex:0 0 auto; border:1px solid rgba(255,255,255,.85); border-radius:999px; padding:7px 15px; background:rgba(255,255,255,.62); color:var(--ink); font:inherit; font-size:.9rem; cursor:pointer; }
+      .app-navigation .nav-link.active { background:linear-gradient(135deg,#d7e9e1,#f4dcd5); font-weight:700; }
+      .review-categories { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+      .review-categories .chip { font-size:.84rem; padding:6px 12px; }
+      .pattern-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr)); gap:12px; }
+      .pattern-card { display:flex; flex-direction:column; align-items:flex-start; gap:8px; width:100%; min-height:120px; padding:16px; border:1px solid rgba(255,255,255,.88); border-radius:14px; background:rgba(255,255,255,.62); color:var(--ink); text-align:left; font:inherit; cursor:pointer; box-shadow:0 4px 14px rgba(80,100,110,.08); }
+      .pattern-card:hover { background:rgba(255,255,255,.82); }
+      .pattern-group,.lesson-tags,.example-tags { color:var(--sub); font-size:.82rem; }
+      .pattern-connect { font-size:.9rem; }
+      .lesson-detail { margin-top:8px; padding:20px; border-radius:14px; background:rgba(255,255,255,.58); }
+      .lesson-detail h2 { margin:10px 0 4px; }
+      .lesson-detail h3 { margin:22px 0 8px; font-size:1.05rem; }
+      .lesson-detail p { margin:7px 0; }
+      .back-button { margin-bottom:8px; }
+      .lesson-connection { font-weight:700; }
+      .reference-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .reference-table,.progress-table { width:100%; border-collapse:collapse; background:rgba(255,255,255,.45); }
+      .reference-table th,.reference-table td,.progress-table th,.progress-table td { padding:10px 12px; border:1px solid var(--line); text-align:left; vertical-align:top; }
+      .reference-table th,.progress-table th { background:rgba(220,235,228,.72); white-space:nowrap; }
+      .example-list { display:grid; gap:10px; }
+      .example-item { padding:12px 14px; border:1px solid rgba(135,164,151,.22); border-radius:10px; background:rgba(255,255,255,.5); }
+      .example-japanese { font-size:1.08rem; }
+      .example-chinese { color:var(--sub); }
+      .lesson-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:20px; }
+      .exercise-setup { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:14px; align-items:end; }
+      .field-label { display:grid; gap:6px; color:var(--sub); font-size:.9rem; }
+      .field-control { width:100%; min-height:44px; padding:9px 11px; border:1px solid rgba(135,164,151,.48); border-radius:10px; background:rgba(255,255,255,.82); color:var(--ink); font:inherit; }
+      .exercise-setup .btn { justify-self:start; }
+      .question-panel { max-width:760px; margin:0 auto; }
+      .question-meta { display:flex; justify-content:space-between; gap:10px; color:var(--sub); font-size:.9rem; }
+      .question-prompt { margin:20px 0; line-height:1.55; }
+      .choice-list { display:grid; gap:10px; }
+      .choice-button { padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.72); color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+      .choice-button:hover { background:rgba(215,233,225,.7); }
+      .answer-form { display:flex; flex-wrap:wrap; gap:9px; }
+      .answer-input { flex:1 1 220px; }
+      .answer-feedback { font-weight:700; font-size:1.15rem; }
+      .answer-feedback.correct { color:#477d65; }
+      .answer-feedback.incorrect { color:#a75e55; }
+      .correct-answer { font-weight:700; }
+      .result-score { font-size:1.4rem; font-weight:700; }
+      .progress-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:14px; }
+      .progress-card { padding:14px; border:1px solid rgba(135,164,151,.24); border-radius:12px; background:rgba(255,255,255,.58); font-weight:700; }
+      .progress-date { color:var(--sub); }
+      .learning-note { margin:16px 0; padding:14px 16px; border:1px solid rgba(135,164,151,.35); border-radius:12px; background:rgba(225,238,232,.58); }
+      .learning-note h3 { margin:0 0 6px; font-size:1rem; }
+      .learning-note p { margin:0; color:var(--sub); }
+      .progress-table { min-width:520px; }
+      .conjugation-table { border-collapse:separate; border-spacing:0; table-layout:fixed; width:100%; min-width:520px; background:rgba(255,255,255,.5); }
+      .conjugation-table col:first-child { width:48%; }
+      .conjugation-table col:last-child { width:52%; }
+      .conjugation-table th,.conjugation-table td { padding:14px 12px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); text-align:center; }
+      .conjugation-table th { position:sticky; top:0; z-index:2; background:rgba(220,235,228,.88); font-weight:700; }
+      .conjugation-table th:first-child,.conjugation-table td:first-child { position:sticky; left:0; z-index:3; background:rgba(248,251,248,.97); }
+      .conjugation-table th:first-child { z-index:5; background:#e1eee8; }
+      .conjugation-table td:first-child { position:sticky; }
+      .conjugation-table td:first-child .row-word { display:block; text-align:center; }
+      .conjugation-table td:first-child .speaker { position:absolute; right:5px; top:50%; transform:translateY(-50%); margin:0; }
+      .conjugation-table tr:first-child th { border-top:1px solid var(--line); }
+      .conjugation-table th:first-child,.conjugation-table td:first-child { border-left:1px solid var(--line); }
+      @media(max-width:600px) { .study-wrap{padding:18px 12px 34px}.study-panel{padding:15px 12px}.category-tabs{gap:6px}.category-tabs .chip{font-size:.78rem;padding-left:8px;padding-right:8px}.study-table{min-width:794px}.study-table col:first-child{width:138px}.study-table col:not(:first-child){width:164px}.study-table th,.study-table td{padding:10px 7px;font-size:.92rem}.conjugation-table{min-width:430px}.conjugation-table th,.conjugation-table td{padding:11px 8px;font-size:.94rem}.cell-button{min-width:0;width:100%;padding:8px 3px;overflow-wrap:anywhere}.speaker{padding:6px 3px}.study-head p{font-size:.95rem} }
+      @media(max-width:600px) { .app-nav-shell{padding:12px 12px 0}.app-navigation .nav-link{padding:7px 12px;font-size:.84rem}.lesson-detail{padding:16px 13px}.lesson-actions .btn{padding:9px 14px}.question-meta{font-size:.82rem} }
     </style>
   </head>
 
     <body>
-    <main class="study-wrap">
+    <div class="app-nav-shell">
+      <nav class="app-navigation" id="app-navigation" aria-label="日文文法複習導覽">
+        <button class="nav-link active" type="button" data-app-page="ndesu" aria-current="page">んです</button>
+        <button class="nav-link" type="button" data-app-page="conjugation" aria-current="false">動詞變形</button>
+        <button class="nav-link" type="button" data-app-page="grammar" aria-current="false">文法</button>
+        <button class="nav-link" type="button" data-app-page="exercise" aria-current="false">練習</button>
+        <button class="nav-link" type="button" data-app-page="progress" aria-current="false">學習紀錄</button>
+      </nav>
+    </div>
+    <main class="study-wrap" id="ndesu-view">
       <header class="study-head">
         <h1>～んです 變形練習</h1>
         
@@ -552,6 +624,10 @@
           <tbody id="tableRows"></tbody>
         </table></div>
       </section>
+    </main>
+    <main class="study-wrap" id="review-view" hidden>
+      <header class="study-head"><h1 id="review-heading">文法複習</h1></header>
+      <section class="study-panel"><div id="review-content"></div></section>
     </main>
     <script>
       (function () {
@@ -660,6 +736,10 @@
         render();
       })();
     </script>
+    <script src="Japanese/grammar/grammar-data.js"></script>
+    <script src="Japanese/exercises/question-data.js"></script>
+    <script src="Japanese/progress/learning-records.js"></script>
+    <script src="Japanese/app.js"></script>
   </body>
 
 </html>
