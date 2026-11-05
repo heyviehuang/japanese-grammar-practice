@@ -506,8 +506,10 @@
       .study-head p { color: var(--sub); margin: 8px 0 0; }
       .study-panel { background: color-mix(in srgb, var(--card) 86%, transparent); border: 1px solid rgba(255,255,255,.8); border-radius: 20px; padding: 22px; box-shadow: 0 10px 32px rgba(80,100,110,.12); }
       .category-title { font-size:1.05rem; margin:0 0 10px; color:var(--ink); }
-      .category-tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
-      .category-tabs .chip { border-radius:999px; color:#344b40; font-weight:700; font-size:.88rem; padding-top:6px; padding-bottom:6px; white-space:nowrap; }
+      .category-tabs { display:flex; flex-wrap:nowrap; gap:8px; margin-bottom:18px; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; touch-action:pan-x; scrollbar-width:none; }
+      .category-tabs::-webkit-scrollbar { display:none; }
+      .category-tabs .chip { flex:0 0 auto; }
+      .category-tabs .chip { border-radius:999px; color:#344b40; font-weight:700; font-size:.88rem; padding:6px 12px; white-space:nowrap; }
       .table-note { color:var(--sub); font-size:.92rem; margin:0 0 14px; }
       .table-scroll { display:block; width:100%; max-width:100%; overflow-x:auto; overflow-y:hidden; border-radius:14px; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; touch-action:pan-x pan-y; scrollbar-width:thin; scrollbar-color:#9bb9aa transparent; }
       .study-table { border-collapse:separate; border-spacing:0; table-layout:fixed; width:100%; min-width:890px; background:rgba(255,255,255,.5); }
@@ -529,9 +531,10 @@
       .study-table td:first-child .speaker { position:absolute; right:5px; top:50%; transform:translateY(-50%); margin:0; }
       .column-speaker { display:block; margin:3px auto 0; font-size:.92rem; }
       .speaker:hover,.column-speaker:hover { background:rgba(215,233,225,.7); }
+      .speaker svg,.column-speaker svg { display:block; width:18px; height:18px; }
       .row-word { display:inline; }
       .empty-state { padding:28px; text-align:center; color:var(--sub); }
-      @media(max-width:600px) { .study-wrap{padding:18px 12px 34px}.study-panel{padding:15px 12px}.study-table{min-width:794px}.study-table col:first-child{width:138px}.study-table col:not(:first-child){width:164px}.study-table th,.study-table td{padding:10px 7px;font-size:.92rem}.cell-button{min-width:0;width:100%;padding:8px 3px;overflow-wrap:anywhere}.speaker{padding:6px 3px}.study-head p{font-size:.95rem} }
+      @media(max-width:600px) { .study-wrap{padding:18px 12px 34px}.study-panel{padding:15px 12px}.category-tabs{gap:6px}.category-tabs .chip{font-size:.78rem;padding-left:8px;padding-right:8px}.study-table{min-width:794px}.study-table col:first-child{width:138px}.study-table col:not(:first-child){width:164px}.study-table th,.study-table td{padding:10px 7px;font-size:.92rem}.cell-button{min-width:0;width:100%;padding:8px 3px;overflow-wrap:anywhere}.speaker{padding:6px 3px}.study-head p{font-size:.95rem} }
     </style>
   </head>
 
@@ -545,7 +548,7 @@
         <nav class="category-tabs" id="categories" role="tablist" aria-label="文法類別"></nav>
         
         <div class="table-scroll"><table class="study-table">
-          <colgroup><col><col><col><col><col></colgroup><thead><tr><th scope="col">辭書形<button class="column-speaker" type="button" data-column="0" aria-label="朗讀辭書形整欄">🔊</button></th><th scope="col">～んです<button class="column-speaker" type="button" data-column="1" aria-label="朗讀～んです整欄">🔊</button></th><th scope="col">～ないんです<button class="column-speaker" type="button" data-column="2" aria-label="朗讀～ないんです整欄">🔊</button></th><th scope="col">～たんです<button class="column-speaker" type="button" data-column="3" aria-label="朗讀～たんです整欄">🔊</button></th><th scope="col">～なかったんです<button class="column-speaker" type="button" data-column="4" aria-label="朗讀～なかったんです整欄">🔊</button></th></tr></thead>
+          <colgroup><col><col><col><col><col></colgroup><thead><tr><th scope="col">辭書形<button class="column-speaker" type="button" data-column="0" aria-label="朗讀辭書形整欄"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></th><th scope="col">～んです<button class="column-speaker" type="button" data-column="1" aria-label="朗讀～んです整欄"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></th><th scope="col">～ないんです<button class="column-speaker" type="button" data-column="2" aria-label="朗讀～ないんです整欄"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></th><th scope="col">～たんです<button class="column-speaker" type="button" data-column="3" aria-label="朗讀～たんです整欄"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></th><th scope="col">～なかったんです<button class="column-speaker" type="button" data-column="4" aria-label="朗讀～なかったんです整欄"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></th></tr></thead>
           <tbody id="tableRows"></tbody>
         </table></div>
       </section>
@@ -615,7 +618,10 @@
           });
         }
         function button(text, label, handler, extra) {
-          var b=document.createElement('button'); b.type='button'; b.textContent=text; b.className=extra||'cell-button'; b.setAttribute('aria-label',label); if (typeof handler === 'function') b.addEventListener('click',handler); return b;
+          var b=document.createElement('button'); b.type='button'; b.className=extra||'cell-button';
+          if (extra === 'speaker') b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+          else b.textContent=text;
+          b.setAttribute('aria-label',label); if (typeof handler === 'function') b.addEventListener('click',handler); return b;
         }
         function renderTabs() {
           var nav=document.getElementById('categories'); nav.innerHTML='';
