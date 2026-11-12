@@ -10,6 +10,8 @@
   var selectedPattern = null;
   var selectedVerbType = 'all';
   var selectedNdesuGroup = 'verb';
+  var speechSessionId = 0;
+  var categoryPlaybackButton = null;
   var nav = document.getElementById('app-navigation');
   var ndesuView = document.getElementById('ndesu-view');
   var reviewView = document.getElementById('review-view');
@@ -118,7 +120,12 @@
 
   function makeExampleCard(example) {
     var block = element('article', 'example-item');
-    block.appendChild(element('p', 'example-japanese', example.japanese));
+    var topLine = element('div', 'example-topline');
+    topLine.appendChild(element('p', 'example-japanese', example.japanese));
+    var audioButton = speakerButton('朗讀日文例句與中文翻譯', function () { speakExample(example); }, 'example-audio');
+    audioButton.disabled = !('speechSynthesis' in window);
+    topLine.appendChild(audioButton);
+    block.appendChild(topLine);
     block.appendChild(element('p', 'example-chinese', example.chinese));
     var tags = (example.patternIds || []).map(pattern).filter(Boolean).map(function (item) { return item.name; });
     tags = tags.concat(example.tags || []).filter(function (tag, index, values) { return values.indexOf(tag) === index; });
@@ -136,7 +143,7 @@
     );
     var tabs = element('div', 'review-categories');
     filters.forEach(function (filter) {
-      var button = action(filter.label, function () { selectedExampleCategory = filter.id; renderExamples(); }, 'chip');
+      var button = action(filter.label, function () { stopSpeech(); selectedExampleCategory = filter.id; renderExamples(); }, 'chip');
       button.setAttribute('aria-pressed', selectedExampleCategory === filter.id ? 'true' : 'false');
       tabs.appendChild(button);
     });
@@ -150,6 +157,15 @@
         return item && (item.category === selectedExampleCategory || item.tags.indexOf(selectedExampleCategory) >= 0);
       });
     });
+    var playbackControls = element('div', 'example-playback-controls');
+    var cycleButton = action('循環朗讀本類別', function () {
+      if (categoryPlaybackButton === cycleButton) { stopSpeech(); return; }
+      startCategoryPlayback(items, cycleButton);
+    }, 'btn ghost');
+    cycleButton.disabled = items.length === 0 || !('speechSynthesis' in window);
+    cycleButton.setAttribute('aria-label', '依序朗讀目前分類的所有例句');
+    playbackControls.appendChild(cycleButton);
+    content.appendChild(playbackControls);
     var list = element('div', 'example-list');
     items.forEach(function (example) { list.appendChild(makeExampleCard(example)); });
     content.appendChild(list);
@@ -199,20 +215,89 @@
     content.appendChild(panel);
   }
 
-  function speakJapaneseList(readings) {
-    if (!('speechSynthesis' in window) || !readings.length) return;
-    window.speechSynthesis.cancel();
-    var voices = window.speechSynthesis.getVoices().filter(function (voice) { return /^ja(-|$)/i.test(voice.lang); });
+  function stopSpeech() {
+    speechSessionId += 1;
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (categoryPlaybackButton) {
+      categoryPlaybackButton.textContent = '循環朗讀本類別';
+      categoryPlaybackButton = null;
+    }
+  }
+  function speechVoice(lang) {
+    if (!('speechSynthesis' in window)) return null;
+    var prefix = lang.split('-')[0].toLowerCase();
+    var voices = window.speechSynthesis.getVoices().filter(function (voice) {
+      return voice.lang.toLowerCase().indexOf(prefix) === 0;
+    });
     voices.sort(function (a, b) {
-      var score = function (voice) { return (voice.lang.toLowerCase() === 'ja-jp' ? 2 : 0) + (voice.localService ? 1 : 0); };
+      var score = function (voice) {
+        var voiceLang = voice.lang.toLowerCase();
+        return (voiceLang === lang.toLowerCase() ? 4 : 0) +
+          (prefix === 'zh' && (voiceLang === 'zh-tw' || voiceLang === 'zh-hant-tw') ? 3 : 0) +
+          (voice.localService ? 1 : 0);
+      };
       return score(b) - score(a);
     });
-    readings.forEach(function (reading) {
-      var utterance = new SpeechSynthesisUtterance(reading);
-      utterance.lang = 'ja-JP'; utterance.rate = 0.94; utterance.pitch = 1;
-      if (voices.length) utterance.voice = voices[0];
+    return voices[0] || null;
+  }
+  function queueSpeech(items, sessionId, onComplete) {
+    if (!('speechSynthesis' in window) || !items.length) {
+      if (onComplete) onComplete();
+      return;
+    }
+    var index = 0;
+    function speakNext() {
+      if (sessionId !== speechSessionId) return;
+      if (index >= items.length) {
+        if (onComplete) onComplete();
+        return;
+      }
+      var item = items[index++];
+      if (!item || !String(item.text || '').trim()) { speakNext(); return; }
+      var utterance = new SpeechSynthesisUtterance(item.text);
+      utterance.lang = item.lang || 'ja-JP';
+      utterance.rate = utterance.lang.indexOf('zh') === 0 ? 2 : 0.94;
+      utterance.pitch = 1;
+      var voice = speechVoice(utterance.lang);
+      if (voice) utterance.voice = voice;
+      utterance.onend = speakNext;
+      utterance.onerror = speakNext;
       window.speechSynthesis.speak(utterance);
-    });
+    }
+    speakNext();
+  }
+  function speakSequence(items) {
+    stopSpeech();
+    queueSpeech(items, speechSessionId);
+  }
+  function speakJapaneseList(readings) {
+    speakSequence(readings.map(function (reading) { return { text: reading, lang: 'ja-JP' }; }));
+  }
+  function exampleSpeechItems(example) {
+    var items = [];
+    if (example.japanese) items.push({ text: example.japanese, lang: 'ja-JP' });
+    if (example.chinese) items.push({ text: example.chinese, lang: 'zh-TW' });
+    return items;
+  }
+  function speakExample(example) {
+    speakSequence(exampleSpeechItems(example));
+  }
+  function startCategoryPlayback(examples, button) {
+    stopSpeech();
+    var sessionId = speechSessionId;
+    var index = 0;
+    categoryPlaybackButton = button;
+    button.textContent = '停止朗讀';
+    function playNextExample() {
+      if (sessionId !== speechSessionId) return;
+      if (index >= examples.length) {
+        button.textContent = '循環朗讀本類別';
+        categoryPlaybackButton = null;
+        return;
+      }
+      queueSpeech(exampleSpeechItems(examples[index++]), sessionId, playNextExample);
+    }
+    playNextExample();
   }
   function speakerButton(label, handler, className) {
     var button = element('button', className || 'speaker');
