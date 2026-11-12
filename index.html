@@ -1149,7 +1149,7 @@
           </table>
         </div>
       </section>
-      <section class="study-panel" id="conjugation-panel" aria-label="動詞基礎變化表">
+      <section class="study-panel" id="conjugation-panel" aria-label="動詞基礎變化表" hidden>
         <div id="conjugation-content"></div>
       </section>
     </main>
@@ -1161,120 +1161,9 @@
         <div id="review-content"></div>
       </section>
     </main>
-    <script>
-      (function () {
-        var groups = [
-          {
-            id: 'verb', label: '動詞', rows: [
-              ['行きます', '行く', '行かない', '行った', '行かなかった', 'いきます', 'いく'],
-              ['帰（かえ）ります', '帰る', '帰らない', '帰った', '帰らなかった', 'かえります', 'かえる'],
-              ['見（み）ます', 'みる', 'みない', 'みた', 'みなかった', 'みます', 'みる'],
-              ['泳（およ）ぎます', 'およぐ', 'およがない', 'およいだ', 'およがなかった', 'およぎます', 'およぐ'],
-              ['飲（の）みます', 'のむ', 'のまない', 'のんだ', 'のまなかった', 'のみます', 'のむ'],
-              ['書（か）きます', 'かく', 'かかない', 'かいた', 'かかなかった', 'かきます', 'かく'],
-              ['います', 'いる', 'いない', 'いた', 'いなかった', 'います', 'いる'],
-              ['待（ま）ちます', 'まつ', 'またない', 'まった', 'またなかった', 'まちます', 'まつ'],
-              ['寝（ね）ます', 'ねる', 'ねない', 'ねた', 'ねなかった', 'ねます', 'ねる'],
-              ['遊（あそ）びます', 'あそぶ', 'あそばない', 'あそんだ', 'あそばなかった', 'あそびます', 'あそぶ'],
-              ['聞（き）きます', 'きく', 'きかない', 'きいた', 'きかなかった', 'ききます', 'きく'],
-              ['食（た）べます', 'たべる', 'たべない', 'たべた', 'たべなかった', 'たべます', 'たべる'],
-              ['話（はな）します', 'はなす', 'はなさない', 'はなした', 'はなさなかった', 'はなします', 'はなす'],
-              ['会（あ）います', 'あう', 'あわない', 'あった', 'あわなかった', 'あいます', 'あう'],
-              ['します', 'する', 'しない', 'した', 'しなかった', 'します', 'する'],
-              ['来（き）ます', 'くる', 'こない', 'きた', 'こなかった', 'きます', 'くる']
-            ]
-          },
-          { id: 'special', label: 'あります・特例', rows: [['あります', 'ある', 'ない', 'あった', 'なかった', 'あります', 'ある']] },
-          {
-            id: 'iadj', label: 'い形容詞', rows: [
-              ['ほしいです', 'ほしい', 'ほしくない', 'ほしかった', 'ほしくなかった', 'ほしいです', 'ほしい'],
-              ['食（た）べたいです', 'たべたい', 'たべたくない', 'たべたかった', 'たべたくなかった', 'たべたいです', 'たべたい'],
-              ['いいです', 'いい', 'よくない', 'よかった', 'よくなかった', 'いいです', 'いい'],
-              ['小さいです', 'ちいさい', 'ちいさくない', 'ちいさかった', 'ちいさくなかった', 'ちいさいです', 'ちいさい']
-            ]
-          },
-          {
-            id: 'naadj', label: 'な形容詞', rows: [
-              ['綺麗（きれい）です', 'きれい', 'きれいじゃない', 'きれいだった', 'きれいじゃなかった', 'きれいです', 'きれい'],
-              ['静かです', 'しずか', 'しずかじゃない', 'しずかだった', 'しずかじゃなかった', 'しずかです', 'しずか'],
-              ['暇（ひま）です', 'ひま', 'ひまじゃない', 'ひまだった', 'ひまじゃなかった', 'ひまです', 'ひま']
-            ]
-          }
-        ];
-        var active = groups[0];
-        function japaneseUtterance(text) {
-          var utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'ja-JP'; utterance.rate = 0.94; utterance.pitch = 1;
-          var voices = window.speechSynthesis.getVoices();
-          var japaneseVoices = voices.filter(function (voice) { return /^ja(-|$)/i.test(voice.lang); });
-          japaneseVoices.sort(function (a, b) {
-            var score = function (voice) { return (voice.lang.toLowerCase() === 'ja-jp' ? 2 : 0) + (voice.localService ? 1 : 0); };
-            return score(b) - score(a);
-          });
-          if (japaneseVoices.length) utterance.voice = japaneseVoices[0];
-          return utterance;
-        }
-        function speak(text) {
-          if (!('speechSynthesis' in window)) return;
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(japaneseUtterance(text));
-        }
-        function speakList(items) {
-          if (!('speechSynthesis' in window) || !items.length) return;
-          window.speechSynthesis.cancel();
-          items.forEach(function (text) { window.speechSynthesis.speak(japaneseUtterance(text)); });
-        }
-        function speakThen(dictionaryForm, conjugatedForm) {
-          if (!('speechSynthesis' in window)) return;
-          window.speechSynthesis.cancel();
-          [dictionaryForm, conjugatedForm].forEach(function (text) {
-            window.speechSynthesis.speak(japaneseUtterance(text));
-          });
-        }
-        function button(text, label, handler, extra) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = extra || 'cell-button';
-          if (extra === 'speaker') b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-          else b.textContent = text;
-          b.setAttribute('aria-label', label); if (typeof handler === 'function') b.addEventListener('click', handler); return b;
-        }
-        function renderTabs() {
-          var nav = document.getElementById('categories'); nav.innerHTML = '';
-          groups.forEach(function (g) {
-            var b = button(g.label, g.label, function () { active = g; render(); }, 'chip');
-            b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', g === active ? 'true' : 'false'); b.setAttribute('aria-pressed', g === active ? 'true' : 'false'); nav.appendChild(b);
-          });
-        }
-        function render() {
-          renderTabs(); var tbody = document.getElementById('tableRows'); tbody.innerHTML = '';
-          active.rows.forEach(function (row) {
-            var tr = document.createElement('tr'), base = document.createElement('td');
-            var word = document.createElement('span'); word.className = 'row-word'; word.textContent = row[6]; base.appendChild(word);
-            var audio = button('🔊', '播放 ' + row[6], function () { speak(row[6]); }, 'speaker'); base.appendChild(audio); tr.appendChild(base);
-            for (var i = 1; i <= 4; i++) {
-              var td = document.createElement('td'), form = row[i] + 'んです';
-              var cell = button('', '', '', 'cell-button');
-              cell.setAttribute('aria-label', '顯示並播放變形'); cell.innerHTML = '<span class="masked">點一下顯示</span>';
-              cell.addEventListener('click', function (target, btn) { return function () { btn.textContent = target; btn.setAttribute('aria-label', '播放 ' + target); btn.onclick = function () { speak(target); }; speakThen(row[6], target); }; }(form, cell));
-              td.appendChild(cell); tr.appendChild(td);
-            }
-            tbody.appendChild(tr);
-          });
-        }
-        document.querySelectorAll('.column-speaker').forEach(function (control) {
-          control.addEventListener('click', function () {
-            var column = Number(control.dataset.column);
-            var items = [];
-            active.rows.forEach(function (row) {
-              if (column === 0) items.push(row[6]);
-              else items.push(row[6], row[column] + 'んです');
-            });
-            speakList(items);
-          });
-        });
-        render();
-      })();
-    </script>
     <script src="Japanese/grammar/grammar-data.js"></script>
+    <script src="Japanese/app-config.js"></script>
+    <script src="Japanese/data-source.js"></script>
     <script src="Japanese/app.js"></script>
   </body>
 

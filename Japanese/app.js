@@ -4,10 +4,12 @@
   try { window.localStorage.removeItem('japanese-grammar-learning-records-v1'); } catch (error) {}
 
   var grammar = window.JapaneseGrammarData;
+  var currentPage = 'ndesu';
   var selectedCategory = 'te-form';
   var selectedExampleCategory = 'all';
   var selectedPattern = null;
   var selectedVerbType = 'all';
+  var selectedNdesuGroup = 'verb';
   var nav = document.getElementById('app-navigation');
   var ndesuView = document.getElementById('ndesu-view');
   var reviewView = document.getElementById('review-view');
@@ -31,6 +33,7 @@
   function category(id) { return grammar.categories.find(function (item) { return item.id === id; }); }
   function pattern(id) { return grammar.patterns.find(function (item) { return item.id === id; }); }
   function setPage(next) {
+    currentPage = next;
     var isNdesu = next === 'ndesu';
     ndesuView.hidden = !isNdesu;
     reviewView.hidden = isNdesu;
@@ -61,6 +64,7 @@
       tab.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
     if (conjugationMode) renderConjugation();
+    else renderNdesu();
   });
 
   function renderGrammar() {
@@ -213,6 +217,61 @@
     button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path d="M16 9a5 5 0 0 1 0 6M18.5 6.5a9 9 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
     button.addEventListener('click', handler); return button;
   }
+  function renderNdesu() {
+    var groups = grammar.ndesuGroups || [];
+    var tabs = document.getElementById('categories');
+    var tbody = document.getElementById('tableRows');
+    tabs.innerHTML = '';
+    tbody.innerHTML = '';
+    groups.forEach(function (group) {
+      var button = action(group.label, function () { selectedNdesuGroup = group.id; renderNdesu(); }, 'chip');
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', selectedNdesuGroup === group.id ? 'true' : 'false');
+      button.setAttribute('aria-pressed', selectedNdesuGroup === group.id ? 'true' : 'false');
+      tabs.appendChild(button);
+    });
+    var active = groups.find(function (group) { return group.id === selectedNdesuGroup; }) || groups[0];
+    if (!active) return;
+    selectedNdesuGroup = active.id;
+    active.rows.forEach(function (row) {
+      var tr = document.createElement('tr'), base = document.createElement('td');
+      base.appendChild(element('span', 'row-word', row[6]));
+      base.appendChild(speakerButton('播放' + row[6], function () { speakJapaneseList([row[6]]); }));
+      tr.appendChild(base);
+      for (var index = 1; index <= 4; index++) {
+        var td = document.createElement('td');
+        var answer = row[index] + 'んです';
+        var reveal = element('button', 'cell-button');
+        reveal.type = 'button';
+        reveal.innerHTML = '<span class="masked">點一下顯示</span>';
+        reveal.setAttribute('aria-label', '顯示並播放變形');
+        reveal.addEventListener('click', function (target, button, dictionaryReading) {
+          return function () {
+            if (button.dataset.revealed === 'true') { speakJapaneseList([target]); return; }
+            button.dataset.revealed = 'true';
+            button.textContent = target;
+            button.setAttribute('aria-label', '播放' + target);
+            speakJapaneseList([dictionaryReading, target]);
+          };
+        }(answer, reveal, row[6]));
+        td.appendChild(reveal);
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    });
+  }
+  document.querySelectorAll('#ndesu-view [data-column]').forEach(function (control) {
+    control.addEventListener('click', function () {
+      var column = Number(control.dataset.column), group = (grammar.ndesuGroups || []).find(function (item) { return item.id === selectedNdesuGroup; });
+      if (!group) return;
+      var readings = [];
+      group.rows.forEach(function (row) {
+        if (column === 0) readings.push(row[6]);
+        else readings.push(row[6], row[column] + 'んです');
+      });
+      speakJapaneseList(readings);
+    });
+  });
   function renderConjugation() {
     conjugationContent.innerHTML = '';
     var typeFilters = [
@@ -292,6 +351,16 @@
     table.appendChild(tbody); tableWrap.appendChild(table); conjugationContent.appendChild(tableWrap);
   }
 
+  renderNdesu();
   document.querySelector('[data-study-mode="conjugation"]').click();
   setPage('ndesu');
+  (window.JapaneseGrammarDataReady || Promise.resolve(grammar)).then(function (data) {
+    grammar = data;
+    if (conjugationPanel.hidden) renderNdesu();
+    else renderConjugation();
+    if (currentPage === 'grammar') renderGrammar();
+    if (currentPage === 'examples') renderExamples();
+  }).catch(function (error) {
+    console.error('Unable to load Japanese grammar data.', error);
+  });
 })();
