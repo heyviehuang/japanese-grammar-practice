@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>日文文法複習系統</title>
+    <title>日文文法筆記</title>
     <link rel="icon" type="image/png" href="Japanese/grammar-icon.png">
     <link rel="apple-touch-icon" href="Japanese/grammar-icon.png">
     <link rel="stylesheet"
@@ -565,10 +565,38 @@
         white-space: nowrap;
       }
 
-      .table-note {
+      .table-scroll-tools {
+        position: sticky;
+        top: 8px;
+        z-index: 8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 8px;
+        padding: 6px 8px;
+        border: 1px solid rgba(255, 255, 255, .78);
+        border-radius: 12px;
+        background: rgba(248, 251, 248, .9);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+      }
+
+      .table-scroll-label {
         color: var(--sub);
-        font-size: .92rem;
-        margin: 0 0 14px;
+        font-size: .86rem;
+      }
+
+      .table-scroll-buttons {
+        display: flex;
+        gap: 6px;
+      }
+
+      .scroll-control {
+        min-width: 42px;
+        padding: 4px 10px !important;
+        font-size: 1.15rem;
+        line-height: 1.3;
       }
 
       .table-scroll {
@@ -590,7 +618,7 @@
         border-spacing: 0;
         table-layout: fixed;
         width: 100%;
-        min-width: 890px;
+        min-width: 1610px;
         background: rgba(255, 255, 255, .5);
       }
 
@@ -839,31 +867,34 @@
         font-weight: 700;
       }
 
+      .lesson-notes {
+        margin: 0 0 18px;
+        padding-left: 1.4em;
+        color: var(--sub);
+        line-height: 1.7;
+      }
+
       .reference-scroll {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
       }
 
-      .reference-table,
-      .progress-table {
+      .reference-table {
         width: 100%;
         border-collapse: collapse;
         background: rgba(255, 255, 255, .45);
       }
 
       .reference-table th,
-      .reference-table td,
-      .progress-table th,
-      .progress-table td {
+      .reference-table td {
         padding: 10px 12px;
         border: 1px solid var(--line);
         text-align: left;
         vertical-align: top;
       }
 
-      .reference-table th,
-      .progress-table th {
+      .reference-table th {
         background: rgba(220, 235, 228, .72);
         white-space: nowrap;
       }
@@ -888,151 +919,12 @@
         color: var(--sub);
       }
 
-      .lesson-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 9px;
-        margin-top: 20px;
-      }
-
-      .exercise-setup {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-        gap: 14px;
-        align-items: end;
-      }
-
-      .field-label {
-        display: grid;
-        gap: 6px;
+      .example-note,
+      .example-source {
+        display: block;
+        margin-top: 8px;
         color: var(--sub);
-        font-size: .9rem;
-      }
-
-      .field-control {
-        width: 100%;
-        min-height: 44px;
-        padding: 9px 11px;
-        border: 1px solid rgba(135, 164, 151, .48);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, .82);
-        color: var(--ink);
-        font: inherit;
-      }
-
-      .exercise-setup .btn {
-        justify-self: start;
-      }
-
-      .question-panel {
-        max-width: 760px;
-        margin: 0 auto;
-      }
-
-      .question-meta {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        color: var(--sub);
-        font-size: .9rem;
-      }
-
-      .question-prompt {
-        margin: 20px 0;
-        line-height: 1.55;
-      }
-
-      .choice-list {
-        display: grid;
-        gap: 10px;
-      }
-
-      .choice-button {
-        padding: 12px 14px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, .72);
-        color: var(--ink);
-        font: inherit;
-        text-align: left;
-        cursor: pointer;
-      }
-
-      .choice-button:hover {
-        background: rgba(215, 233, 225, .7);
-      }
-
-      .answer-form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 9px;
-      }
-
-      .answer-input {
-        flex: 1 1 220px;
-      }
-
-      .answer-feedback {
-        font-weight: 700;
-        font-size: 1.15rem;
-      }
-
-      .answer-feedback.correct {
-        color: #477d65;
-      }
-
-      .answer-feedback.incorrect {
-        color: #a75e55;
-      }
-
-      .correct-answer {
-        font-weight: 700;
-      }
-
-      .result-score {
-        font-size: 1.4rem;
-        font-weight: 700;
-      }
-
-      .progress-summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-        gap: 10px;
-        margin-bottom: 14px;
-      }
-
-      .progress-card {
-        padding: 14px;
-        border: 1px solid rgba(135, 164, 151, .24);
-        border-radius: 12px;
-        background: rgba(255, 255, 255, .58);
-        font-weight: 700;
-      }
-
-      .progress-date {
-        color: var(--sub);
-      }
-
-      .learning-note {
-        margin: 16px 0;
-        padding: 14px 16px;
-        border: 1px solid rgba(135, 164, 151, .35);
-        border-radius: 12px;
-        background: rgba(225, 238, 232, .58);
-      }
-
-      .learning-note h3 {
-        margin: 0 0 6px;
-        font-size: 1rem;
-      }
-
-      .learning-note p {
-        margin: 0;
-        color: var(--sub);
-      }
-
-      .progress-table {
-        min-width: 520px;
+        font-size: .86rem;
       }
 
       .conjugation-table {
@@ -1127,7 +1019,7 @@
         }
 
         .study-table {
-          min-width: 794px
+        min-width: 1450px
         }
 
         .study-table col:first-child {
@@ -1184,38 +1076,30 @@
           padding: 16px 13px
         }
 
-        .lesson-actions .btn {
-          padding: 9px 14px
-        }
-
-        .question-meta {
-          font-size: .82rem
-        }
       }
     </style>
   </head>
 
   <body>
     <div class="app-nav-shell">
-      <nav class="app-navigation" id="app-navigation" aria-label="日文文法複習導覽">
-        <button class="nav-link active" type="button" data-app-page="ndesu" aria-current="page">型態變化</button>
-        <button class="nav-link" type="button" data-app-page="grammar" aria-current="false">文法</button>
-        <button class="nav-link" type="button" data-app-page="exercise" aria-current="false">練習</button>
-        <button class="nav-link" type="button" data-app-page="progress" aria-current="false">學習紀錄</button>
+      <nav class="app-navigation" id="app-navigation" aria-label="日文文法筆記導覽">
+        <button class="nav-link active" type="button" data-app-page="ndesu" aria-current="page">詞性與變化</button>
+        <button class="nav-link" type="button" data-app-page="grammar" aria-current="false">文法重點</button>
+        <button class="nav-link" type="button" data-app-page="examples" aria-current="false">例句</button>
       </nav>
     </div>
     <main class="study-wrap" id="ndesu-view">
       <header class="study-head">
-        <h1 id="study-heading">～んです 變形練習</h1>
+        <h1 id="study-heading">動詞基礎變化</h1>
 
       </header>
-      <nav class="category-tabs" id="study-modes" role="tablist" aria-label="練習類型">
-        <button class="chip" type="button" role="tab" aria-selected="false" aria-pressed="false"
-          data-study-mode="conjugation">て・た・ない・ます形</button>
+      <nav class="category-tabs" id="study-modes" role="tablist" aria-label="內容類型">
         <button class="chip" type="button" role="tab" aria-selected="true" aria-pressed="true"
+          data-study-mode="conjugation">基礎變化</button>
+        <button class="chip" type="button" role="tab" aria-selected="false" aria-pressed="false"
           data-study-mode="ndesu">んです</button>
       </nav>
-      <section class="study-panel" aria-label="～んです變形表">
+      <section class="study-panel" aria-label="動詞基礎變化表" hidden>
         <nav class="category-tabs" id="categories" role="tablist" aria-label="文法類別"></nav>
 
         <div class="table-scroll">
@@ -1265,13 +1149,13 @@
           </table>
         </div>
       </section>
-      <section class="study-panel" id="conjugation-panel" aria-label="動詞變形表" hidden>
+      <section class="study-panel" id="conjugation-panel" aria-label="動詞基礎變化表">
         <div id="conjugation-content"></div>
       </section>
     </main>
     <main class="study-wrap" id="review-view" hidden>
       <header class="study-head">
-        <h1 id="review-heading">文法複習</h1>
+        <h1 id="review-heading">文法筆記</h1>
       </header>
       <section class="study-panel">
         <div id="review-content"></div>
@@ -1391,8 +1275,6 @@
       })();
     </script>
     <script src="Japanese/grammar/grammar-data.js"></script>
-    <script src="Japanese/exercises/question-data.js"></script>
-    <script src="Japanese/progress/learning-records.js"></script>
     <script src="Japanese/app.js"></script>
   </body>
 
