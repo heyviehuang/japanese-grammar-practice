@@ -18,6 +18,77 @@ function doGet(request) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('日文文法筆記')
+    .addItem('補齊空白 ID', 'fillMissingIds')
+    .addToUi();
+}
+
+/** Assign a stable ID when a new grammar or example is entered. */
+function onEdit(event) {
+  if (!event || !event.range || event.range.getRow() < 2) return;
+
+  var sheet = event.range.getSheet();
+  var config = idConfigForSheet_(sheet.getName());
+  if (!config) return;
+
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
+  var contentColumn = headers.indexOf(config.contentHeader) + 1;
+  if (!contentColumn) return;
+  var firstEditedColumn = event.range.getColumn();
+  var lastEditedColumn = firstEditedColumn + event.range.getNumColumns() - 1;
+  if (contentColumn < firstEditedColumn || contentColumn > lastEditedColumn) return;
+
+  assignMissingIds_(sheet, config);
+}
+
+/** A menu action for bulk pastes that skipped the normal edit event. */
+function fillMissingIds() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  assignMissingIds_(spreadsheet.getSheetByName('Grammar'), idConfigForSheet_('Grammar'));
+  assignMissingIds_(spreadsheet.getSheetByName('Examples'), idConfigForSheet_('Examples'));
+  spreadsheet.toast('已補齊文法與例句 ID。', '日文文法筆記', 5);
+}
+
+function idConfigForSheet_(sheetName) {
+  if (sheetName === 'Grammar') return { idHeader: 'patternId', contentHeader: 'name', prefix: 'pattern' };
+  if (sheetName === 'Examples') return { idHeader: 'exampleId', contentHeader: 'japanese', prefix: 'example' };
+  return null;
+}
+
+function assignMissingIds_(sheet, config) {
+  if (!sheet || !config) return;
+  var lastRow = sheet.getLastRow();
+  var lastColumn = sheet.getLastColumn();
+  if (lastRow < 2 || lastColumn < 1) return;
+
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
+  var idColumn = headers.indexOf(config.idHeader) + 1;
+  var contentColumn = headers.indexOf(config.contentHeader) + 1;
+  if (!idColumn || !contentColumn) return;
+
+  var rowCount = lastRow - 1;
+  var ids = sheet.getRange(2, idColumn, rowCount, 1).getDisplayValues();
+  var content = sheet.getRange(2, contentColumn, rowCount, 1).getDisplayValues();
+  var matcher = new RegExp('^' + config.prefix + '-(\\d+)$');
+  var nextNumber = 0;
+  ids.forEach(function (cell) {
+    var match = cell[0].match(matcher);
+    if (match) nextNumber = Math.max(nextNumber, Number(match[1]));
+  });
+
+  var changed = false;
+  for (var index = 0; index < rowCount; index++) {
+    if (content[index][0].trim() && !ids[index][0].trim()) {
+      nextNumber += 1;
+      ids[index][0] = config.prefix + '-' + ('000' + nextNumber).slice(-3);
+      changed = true;
+    }
+  }
+  if (changed) sheet.getRange(2, idColumn, rowCount, 1).setValues(ids);
+}
+
 function readNotebookData_() {
   var categories = readRows_('Categories').map(function (row) {
     return {

@@ -5,10 +5,8 @@ A static Japanese grammar notebook built with plain HTML, CSS, and browser JavaS
 ## Project structure
 
 - `index.html` contains the navigation for word forms, grammar notes, and example notes, plus shared styles.
-- `Japanese/grammar/grammar-data.js` stores grammar categories, grammar entries, reference tables, course examples, and verb conjugations.
-- `Japanese/grammar-notes-import.xlsx` is the editable Google Sheets import workbook.
 - `Japanese/apps-script/Code.gs` serves spreadsheet rows as read-only JSON; see `APPS_SCRIPT_SETUP.md` to deploy it.
-- `Japanese/app-config.js` stores the Apps Script `/exec` URL; `Japanese/data-source.js` loads cloud data and falls back to the local copy.
+- `Japanese/app-config.js` stores the Apps Script `/exec` URL; `Japanese/data-source.js` loads data from Apps Script.
 - `Japanese/app.js` renders the grammar notebook, conjugation tables, and filterable example library.
 - `Japanese/grammar-icon.png` is the transparent site icon.
 

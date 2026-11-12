@@ -3,7 +3,7 @@
 
   try { window.localStorage.removeItem('japanese-grammar-learning-records-v1'); } catch (error) {}
 
-  var grammar = window.JapaneseGrammarData;
+  var grammar = null;
   var currentPage = 'ndesu';
   var selectedCategory = 'te-form';
   var selectedExampleCategory = 'all';
@@ -19,6 +19,7 @@
   var conjugationContent = document.getElementById('conjugation-content');
   var ndesuPanel = document.querySelector('#ndesu-view > .study-panel');
   var studyHeading = document.getElementById('study-heading');
+  var dataStatus = document.getElementById('data-status');
 
   function element(tag, className, text) {
     var node = document.createElement(tag);
@@ -43,6 +44,7 @@
       button.classList.toggle('active', active);
     });
     if (isNdesu) return;
+    if (!grammar) return;
     if (next === 'grammar') renderGrammar();
     if (next === 'examples') renderExamples();
   }
@@ -63,6 +65,7 @@
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
       tab.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
+    if (!grammar) return;
     if (conjugationMode) renderConjugation();
     else renderNdesu();
   });
@@ -262,7 +265,7 @@
   }
   document.querySelectorAll('#ndesu-view [data-column]').forEach(function (control) {
     control.addEventListener('click', function () {
-      var column = Number(control.dataset.column), group = (grammar.ndesuGroups || []).find(function (item) { return item.id === selectedNdesuGroup; });
+      var column = Number(control.dataset.column), group = grammar && (grammar.ndesuGroups || []).find(function (item) { return item.id === selectedNdesuGroup; });
       if (!group) return;
       var readings = [];
       group.rows.forEach(function (row) {
@@ -351,16 +354,17 @@
     table.appendChild(tbody); tableWrap.appendChild(table); conjugationContent.appendChild(tableWrap);
   }
 
-  renderNdesu();
-  document.querySelector('[data-study-mode="conjugation"]').click();
-  setPage('ndesu');
-  (window.JapaneseGrammarDataReady || Promise.resolve(grammar)).then(function (data) {
+  window.JapaneseGrammarDataReady.then(function (data) {
     grammar = data;
-    if (conjugationPanel.hidden) renderNdesu();
-    else renderConjugation();
+    dataStatus.hidden = true;
+    renderNdesu();
+    var activeMode = document.querySelector('[data-study-mode][aria-selected="true"]');
+    if (activeMode) activeMode.click();
     if (currentPage === 'grammar') renderGrammar();
     if (currentPage === 'examples') renderExamples();
   }).catch(function (error) {
+    dataStatus.textContent = '雲端筆記目前無法載入，請確認 Apps Script 部署狀態與網路連線後重新整理。';
+    dataStatus.classList.add('error');
     console.error('Unable to load Japanese grammar data.', error);
   });
 })();

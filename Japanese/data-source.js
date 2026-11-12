@@ -1,7 +1,6 @@
 (function () {
   'use strict';
 
-  var fallback = window.JapaneseGrammarData;
   var endpoint = String(window.JAPANESE_GRAMMAR_API_URL || '').trim();
 
   function isNotebookData(data) {
@@ -11,8 +10,8 @@
   }
 
   if (!endpoint) {
-    window.JapaneseGrammarDataReady = Promise.resolve(fallback);
-    window.JapaneseGrammarDataSource = 'local';
+    window.JapaneseGrammarDataReady = Promise.reject(new Error('Apps Script endpoint is not configured.'));
+    window.JapaneseGrammarDataSource = 'unconfigured';
     return;
   }
 
@@ -52,9 +51,8 @@
       return data;
     })
     .catch(function (error) {
-      console.warn('Could not load cloud grammar data; using the local copy.', error);
-      window.JapaneseGrammarDataSource = 'local-fallback';
-      if (isNotebookData(fallback)) return fallback;
+      console.error('Could not load cloud grammar data.', error);
+      window.JapaneseGrammarDataSource = 'error';
       throw error;
     });
 })();

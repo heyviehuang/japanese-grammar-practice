@@ -501,6 +501,20 @@
         display: none !important
       }
 
+      .data-status {
+        margin: 12px 0;
+        padding: 12px 14px;
+        border: 1px solid rgba(135, 164, 151, .3);
+        border-radius: 12px;
+        background: rgba(248, 251, 248, .82);
+        color: var(--sub);
+      }
+
+      .data-status.error {
+        color: #8a514b;
+        border-color: rgba(176, 109, 99, .4);
+      }
+
       /* Dictionary-form study table */
       .study-wrap {
         max-width: 1100px;
@@ -1088,6 +1102,7 @@
         <button class="nav-link" type="button" data-app-page="examples" aria-current="false">例句</button>
       </nav>
     </div>
+    <div class="data-status study-wrap" id="data-status" role="status" aria-live="polite">正在讀取雲端筆記…</div>
     <main class="study-wrap" id="ndesu-view">
       <header class="study-head">
         <h1 id="study-heading">動詞基礎變化</h1>
@@ -1161,7 +1176,6 @@
         <div id="review-content"></div>
       </section>
     </main>
-    <script src="Japanese/grammar/grammar-data.js"></script>
     <script src="Japanese/app-config.js"></script>
     <script src="Japanese/data-source.js"></script>
     <script src="Japanese/app.js"></script>
