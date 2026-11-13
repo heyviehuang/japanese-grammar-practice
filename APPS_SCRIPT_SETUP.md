@@ -9,7 +9,7 @@ If setting up a new copy, import the downloaded `.xlsx` into Google Sheets. Keep
 ## 2. Create the read-only Apps Script endpoint
 
 1. In the spreadsheet, select **Extensions → Apps Script**.
-2. Replace the starter code in `Code.gs` with the contents of `Japanese/apps-script/Code.gs` in this project, then save. This version also adds automatic IDs for new grammar and example rows.
+2. Replace the starter code in `Code.gs` with the contents of `Japanese/apps-script/Code.gs` in this project, then save. This version also returns each `exampleId` and links any sentence modules to that example.
 3. Select **Deploy → New deployment**.
 4. Choose **Web app**, set **Execute as** to your account, and set access to **Anyone** so the website can read the notebook data. Anyone with the endpoint can read these notes, so only put content here that you are comfortable sharing. The script only reads the spreadsheet; it has no write endpoint.
 5. Deploy and copy the URL ending in `/exec`.
@@ -18,10 +18,21 @@ If the web app was already deployed, use **Deploy → Manage deployments**, edit
 
 ## Adding content in the spreadsheet
 
-- Add a grammar row in `Grammar` and fill its name and content. When the `name` cell is entered, Apps Script fills an empty `patternId` such as `pattern-001`.
+- Add a grammar row in `Grammar` and fill its name and content. When the `name` cell is entered, Apps Script fills an empty `patternId` such as `pattern-001`. Grammar rows contain rules and explanations; keep example sentences in `Examples` only.
+- When a grammar item has an example, add that sentence once in `Examples` and put the grammar row's `patternId` in its `patternIds` cell. Multiple grammar IDs can point to the same example.
 - Add an example row in `Examples` and fill its Japanese sentence and content. Apps Script fills an empty `exampleId` such as `example-102`.
-- Keep IDs on existing rows unchanged. To link an example to a grammar item, copy its generated `patternId` into `patternIds`; separate multiple IDs with `|`.
-- After pasting multiple rows, if any IDs remain blank, reload the sheet and select **日文文法筆記 → 補齊空白 ID**.
+- Keep each Japanese sentence in one `Examples` row. Link it to multiple grammar items by separating their IDs in `patternIds` with `|`; the example list combines matching tags and notes instead of showing duplicate sentences.
+- Add or edit verb conjugations in `VerbForms`. To include a verb in the `んです` table, set `ndesuCategory` to `verb`; use `special` for special rows such as ある. Its `んです` forms are generated from these shared conjugations. `Ndesu` is for adjective and noun entries only.
+- Add a `SentenceExerciseModules` tab with these headers: `exampleId`, `moduleId`, `moduleLabel`, `moduleOrder`, `correctOption`, `options`. Add one row per language module and use the existing example's `exampleId` to link it. Put module choices in `options`, separated by `|`. The exercise reads its prompt, answer, translation, and grammar tags from that example row, so do not copy the sentence into the module sheet.
+- Example module rows linked to the existing `example-002` sentence in `Examples`:
+
+  | exampleId | moduleId | moduleLabel | moduleOrder | correctOption | options |
+  | --- | --- | --- | --- | --- | --- |
+  | example-002 | te-form | 動詞て形 | 1 | 疲れていて | 疲れていて\|疲れて\|疲れていた |
+  | example-002 | grammar | 文法接續 | 2 | も | も\|から\|が |
+  | example-002 | verb | 動詞變化 | 3 | 勉強します。 | 勉強します。\|勉強しました。\|勉強しています。 |
+- Keep IDs on existing rows unchanged. To link an example to a grammar item, copy its generated `patternId` into `patternIds`; separate multiple IDs with `|`. Enter the sentence and translation only once in `Examples`.
+- After pasting multiple rows, if any IDs remain blank, reload the sheet and select **日文文法筆記 → 補齊空白 ID**. Repeat the same `exampleId` in each module row belonging to that sentence. Examples without module rows remain in the example list and are not offered as practice questions.
 - For ordinary content edits, save the sheet and refresh the website. No Git push is needed.
 
 ## 3. Point the website to the endpoint
@@ -30,4 +41,4 @@ If the web app was already deployed, use **Deploy → Manage deployments**, edit
 2. Set `window.JAPANESE_GRAMMAR_API_URL` to the copied `/exec` URL.
 3. Publish the site. It will request the spreadsheet data when it opens. The browser uses the endpoint's read-only JSONP response to avoid cross-origin fetch restrictions. If the endpoint is blank or unavailable, the page displays a cloud-data error instead of loading a local copy.
 
-After editing the spreadsheet, refresh the site to load the latest data. Keep the workbook and the local data backup in version control so the notebook can still be restored if the spreadsheet is changed accidentally.
+The site includes a built-in demonstration linked to `example-002` until module rows are available from Apps Script. To load exercise modules from Sheets, add the `SentenceExerciseModules` tab and deploy the updated `Code.gs` as a **New version** using **Deploy → Manage deployments**. The existing `/exec` URL normally stays the same. After editing the spreadsheet, refresh the site to load the latest data.

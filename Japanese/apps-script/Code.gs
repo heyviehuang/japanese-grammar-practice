@@ -112,14 +112,13 @@ function readNotebookData_() {
       tags: splitList_(row.additionalCategoryIds),
       connection: row.connection,
       explanation: row.explanation,
-      notes: splitLines_(row.notes),
-      example: row.example,
-      translation: row.translation
+      notes: splitLines_(row.notes)
     };
   });
 
   var examples = readRows_('Examples').map(function (row) {
     return {
+      id: row.exampleId,
       japanese: row.japanese,
       chinese: row.chinese,
       patternIds: splitList_(row.patternIds),
@@ -129,8 +128,38 @@ function readNotebookData_() {
     };
   });
 
+  var modulesByExampleId = {};
+  readOptionalRows_('SentenceExerciseModules').forEach(function (row) {
+    if (!row.exampleId || !row.moduleId) return;
+    if (!modulesByExampleId[row.exampleId]) modulesByExampleId[row.exampleId] = [];
+    modulesByExampleId[row.exampleId].push({
+      id: row.moduleId,
+      label: row.moduleLabel,
+      order: Number(row.moduleOrder) || modulesByExampleId[row.exampleId].length + 1,
+      correct: row.correctOption,
+      options: splitList_(row.options)
+    });
+  });
+
+  var exercises = examples.filter(function (example) {
+    return example.id && modulesByExampleId[example.id] && modulesByExampleId[example.id].length;
+  }).map(function (example) {
+    var modules = modulesByExampleId[example.id];
+    modules.sort(function (a, b) { return a.order - b.order; });
+    return {
+      id: example.id,
+      prompt: example.chinese,
+      answer: example.japanese,
+      explanation: example.note,
+      patternIds: example.patternIds,
+      tags: example.tags,
+      modules: modules
+    };
+  });
+
+  var rawVerbRows = readRows_('VerbForms');
   var formNames = ['masu', 'te', 'ta', 'nai', 'potential', 'volitional', 'conditional', 'imperative'];
-  var verbConjugations = readRows_('VerbForms').map(function (row) {
+  var verbConjugations = rawVerbRows.map(function (row) {
     var forms = {};
     formNames.forEach(function (name) {
       forms[name] = [row[name], row[name + 'Reading']];
@@ -145,26 +174,34 @@ function readNotebookData_() {
 
   var ndesuGroups = [];
   var groupsById = {};
-  readRows_('Ndesu').forEach(function (row) {
-    if (!groupsById[row.categoryId]) {
-      groupsById[row.categoryId] = { id: row.categoryId, label: row.category, rows: [] };
-      ndesuGroups.push(groupsById[row.categoryId]);
+  function addNdesuRow_(categoryId, label, row) {
+    if (!groupsById[categoryId]) {
+      groupsById[categoryId] = { id: categoryId, label: label, rows: [] };
+      ndesuGroups.push(groupsById[categoryId]);
     }
-    groupsById[row.categoryId].rows.push([
-      row.masu,
-      removeEnding_(row.ndesu, 'んです'),
-      removeEnding_(row.naiNdesu, 'んです'),
-      removeEnding_(row.taNdesu, 'んです'),
-      removeEnding_(row.nakattaNdesu, 'んです'),
-      row.masu,
-      row.reading
-    ]);
+    groupsById[categoryId].rows.push(row);
+  }
+
+  rawVerbRows.filter(function (row) { return row.ndesuCategory; }).forEach(function (row) {
+    var negativePast = String(row.nai || '').replace(/い$/, 'かった');
+    addNdesuRow_(row.ndesuCategory, row.ndesuCategory === 'special' ? 'あります・特例' : '動詞', {
+      reading: row.reading,
+      forms: [row.dictionary + 'んです', row.nai + 'んです', row.ta + 'んです', negativePast + 'んです']
+    });
+  });
+
+  readRows_('Ndesu').forEach(function (row) {
+    addNdesuRow_(row.categoryId, row.category, {
+      reading: row.reading,
+      forms: [row.ndesu, row.naiNdesu, row.taNdesu, row.nakattaNdesu]
+    });
   });
 
   return {
     categories: categories,
     patterns: patterns,
     examples: examples,
+    exercises: exercises,
     verbConjugations: verbConjugations,
     ndesuGroups: ndesuGroups
   };
@@ -187,15 +224,15 @@ function readRows_(sheetName) {
   });
 }
 
+function readOptionalRows_(sheetName) {
+  if (!SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName)) return [];
+  return readRows_(sheetName);
+}
+
 function splitList_(value) {
   return String(value || '').split('|').map(function (item) { return item.trim(); }).filter(Boolean);
 }
 
 function splitLines_(value) {
   return String(value || '').split(/\r?\n/).map(function (item) { return item.trim(); }).filter(Boolean);
-}
-
-function removeEnding_(value, ending) {
-  var text = String(value || '');
-  return text.slice(-ending.length) === ending ? text.slice(0, -ending.length) : text;
 }

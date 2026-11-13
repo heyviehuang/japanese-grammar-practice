@@ -674,6 +674,235 @@ button:disabled,
   font-size: .86rem;
 }
 
+/* 例句頁的單題組句練習 */
+.example-modes {
+  margin-bottom: 18px;
+}
+
+.sentence-exercise {
+  display: grid;
+  gap: 16px;
+}
+
+.sentence-exercise-top,
+.exercise-section-heading,
+.exercise-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sentence-exercise-title h2,
+.exercise-section-heading h3 {
+  margin: 0;
+  color: var(--heading-main);
+}
+
+.sentence-exercise-title h2 {
+  font-size: 1.35rem;
+}
+
+.sentence-exercise-title p,
+.exercise-section-heading span {
+  margin: 4px 0 0;
+  color: var(--supporting-text);
+  font-size: .9rem;
+}
+
+.exercise-progress {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border: 1px solid var(--accent-line);
+  border-radius: 3px;
+  color: var(--heading-main);
+  font-size: .88rem;
+  font-weight: 700;
+}
+
+.exercise-prompt,
+.exercise-builder,
+.exercise-module,
+.exercise-feedback {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-raised);
+}
+
+.exercise-prompt {
+  padding: 13px 16px;
+}
+
+.exercise-eyebrow {
+  margin: 0 0 5px;
+  color: var(--supporting-text);
+  font-size: .84rem;
+}
+
+.exercise-prompt-text {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  font-weight: 700;
+}
+
+.exercise-builder {
+  padding: 12px 14px;
+}
+
+.exercise-section-heading h3 {
+  font-size: 1rem;
+}
+
+.exercise-section-heading span {
+  margin: 0;
+}
+
+.sentence-pieces {
+  display: flex;
+  min-height: 44px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.sentence-piece {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 11px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: .98rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sentence-piece.is-empty {
+  min-width: 42px;
+  border-style: dashed;
+  border-color: var(--page-line);
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+}
+
+.assembled-reading {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+  letter-spacing: .04em;
+}
+
+.exercise-module-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.exercise-module {
+  min-width: 0;
+  padding: 12px;
+}
+
+.exercise-module h4 {
+  margin: 0 0 10px;
+  color: var(--heading-section);
+  font-size: .94rem;
+}
+
+.exercise-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.exercise-option {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--page-line);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+
+.exercise-option:hover,
+.exercise-option[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.exercise-option[aria-pressed="true"] {
+  font-weight: 700;
+}
+
+.exercise-actions {
+  justify-content: flex-start;
+}
+
+.exercise-actions .btn:disabled {
+  opacity: .48;
+}
+
+.exercise-feedback {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 12px 14px;
+}
+
+.exercise-feedback strong {
+  color: var(--heading-main);
+}
+
+.exercise-answer {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.exercise-explanation {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  color: var(--annotation-text);
+  font-size: .9rem;
+}
+
+.exercise-audio {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--accent-line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--heading-main);
+  cursor: pointer;
+}
+
+.exercise-audio svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 800px) {
+  .exercise-module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* 小型舊元件樣式保留 */
 .word {
   margin: 0;
@@ -916,6 +1145,41 @@ input[type="text"]:focus {
 
   .lesson-detail {
     padding: 16px 13px;
+  }
+
+  .sentence-exercise {
+    gap: 12px;
+  }
+
+  .sentence-exercise-top {
+    align-items: flex-start;
+  }
+
+  .sentence-exercise-title h2 {
+    font-size: 1.15rem;
+  }
+
+  .exercise-prompt,
+  .exercise-builder {
+    padding: 11px;
+  }
+
+  .exercise-module {
+    padding: 10px;
+  }
+
+  .exercise-option {
+    padding: 6px 8px;
+    font-size: .84rem;
+  }
+
+  .exercise-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .exercise-actions .btn {
+    padding: 9px 10px;
   }
 
   #home,

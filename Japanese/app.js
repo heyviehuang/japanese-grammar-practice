@@ -7,6 +7,10 @@
   var currentPage = 'ndesu';
   var selectedCategory = 'te-form';
   var selectedExampleCategory = 'all';
+  var selectedExampleMode = 'list';
+  var selectedExerciseId = null;
+  var selectedExerciseAnswers = {};
+  var exerciseResult = null;
   var selectedPattern = null;
   var selectedVerbType = 'all';
   var selectedNdesuGroup = 'verb';
@@ -22,6 +26,17 @@
   var ndesuPanel = document.querySelector('#ndesu-view > .study-panel');
   var studyHeading = document.getElementById('study-heading');
   var dataStatus = document.getElementById('data-status');
+  var demoSentenceExercises = [{
+    id: 'example-002',
+    prompt: '即使很累也要讀書。',
+    answer: '疲れていても、勉強します。',
+    explanation: '「疲れていても」表示即使很累；「勉強します」表示讀書。',
+    modules: [
+      { id: 'te-form', label: '動詞て形', order: 1, correct: '疲れていて', options: ['疲れていて', '疲れて', '疲れていた'] },
+      { id: 'grammar', label: '文法接續', order: 2, correct: 'も', options: ['も', 'から', 'が'] },
+      { id: 'verb', label: '動詞變化', order: 3, correct: '勉強します。', options: ['勉強します。', '勉強しました。', '勉強しています。'] }
+    ]
+  }];
 
   function element(tag, className, text) {
     var node = document.createElement(tag);
@@ -107,15 +122,27 @@
     var items = grammar.examples.map(function (example) {
       return Object.assign({}, example, { patternIds: (example.patternIds || []).slice() });
     });
-    grammar.patterns.forEach(function (item) {
-      var existing = items.find(function (example) { return example.japanese === item.example; });
-      if (existing) {
-        if (existing.patternIds.indexOf(item.id) < 0) existing.patternIds.push(item.id);
-      } else {
-        items.push({ japanese: item.example, chinese: item.translation, patternIds: [item.id] });
+    var uniqueItems = [];
+    items.forEach(function (example) {
+      var existing = uniqueItems.find(function (item) { return item.japanese === example.japanese; });
+      if (!existing) {
+        uniqueItems.push(example);
+        return;
       }
+      (example.patternIds || []).forEach(function (id) {
+        if (existing.patternIds.indexOf(id) < 0) existing.patternIds.push(id);
+      });
+      (example.tags || []).forEach(function (tag) {
+        if (!existing.tags) existing.tags = [];
+        if (existing.tags.indexOf(tag) < 0) existing.tags.push(tag);
+      });
+      ['note', 'source'].forEach(function (key) {
+        if (example[key] && existing[key] !== example[key]) {
+          existing[key] = existing[key] ? existing[key] + '／' + example[key] : example[key];
+        }
+      });
     });
-    return items;
+    return uniqueItems;
   }
 
   function makeExampleCard(example) {
@@ -132,12 +159,163 @@
     if (tags.length) block.appendChild(element('small', 'example-tags', '標籤：' + tags.join('、')));
     if (example.note) block.appendChild(element('p', 'example-note', example.note));
     if (example.source) block.appendChild(element('small', 'example-source', example.source));
+    var linkedExercise = sentenceExercises().find(function (item) {
+      return item.id === example.id || (!example.id && item.answer === example.japanese);
+    });
+    if (linkedExercise) {
+      block.appendChild(action('用這句練習組句', function () {
+        selectedExampleMode = 'exercise';
+        selectedExerciseId = linkedExercise.id;
+        selectedExerciseAnswers = {};
+        exerciseResult = null;
+        renderExamples();
+      }, 'btn ghost practice-example-button'));
+    }
     return block;
+  }
+
+  function sentenceExercises() {
+    if (grammar && Array.isArray(grammar.exercises) && grammar.exercises.length) {
+      var firstExercise = grammar.exercises[0];
+      if (firstExercise && Array.isArray(firstExercise.modules) && firstExercise.modules.length) return grammar.exercises;
+    }
+    return demoSentenceExercises;
+  }
+
+  function renderExampleModeTabs() {
+    var tabs = element('nav', 'example-modes category-tabs');
+    tabs.setAttribute('aria-label', '例句頁面內容');
+    tabs.setAttribute('role', 'tablist');
+    [
+      { id: 'list', label: '例句列表' },
+      { id: 'exercise', label: '組句練習' }
+    ].forEach(function (mode) {
+      var button = action(mode.label, function () {
+        stopSpeech();
+        selectedExampleMode = mode.id;
+        renderExamples();
+      }, 'chip');
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', selectedExampleMode === mode.id ? 'true' : 'false');
+      button.setAttribute('aria-pressed', selectedExampleMode === mode.id ? 'true' : 'false');
+      tabs.appendChild(button);
+    });
+    content.appendChild(tabs);
+  }
+
+  function renderSentenceExercise() {
+    var exercises = sentenceExercises();
+    var exercise = exercises.filter(function (item) { return item.id === selectedExerciseId; })[0] || exercises[0];
+    if (!exercise || !Array.isArray(exercise.modules) || !exercise.modules.length) {
+      content.appendChild(element('p', 'empty-state', '目前還沒有組句練習題。'));
+      return;
+    }
+
+    var modules = exercise.modules.slice().sort(function (a, b) { return Number(a.order) - Number(b.order); });
+    var complete = modules.every(function (module) { return !!selectedExerciseAnswers[module.id]; });
+    var assembled = modules.map(function (module) { return selectedExerciseAnswers[module.id] || ''; }).join('');
+    var exercisePanel = element('section', 'sentence-exercise');
+    var top = element('div', 'sentence-exercise-top');
+    var titleGroup = element('div', 'sentence-exercise-title');
+    titleGroup.appendChild(element('h2', '', '日文組句練習'));
+    titleGroup.appendChild(element('p', '', '請選擇各語言模塊，組成完整句子。'));
+    top.appendChild(titleGroup);
+    top.appendChild(element('span', 'exercise-progress', '01 / 01'));
+    exercisePanel.appendChild(top);
+
+    var prompt = element('section', 'exercise-prompt');
+    prompt.appendChild(element('p', 'exercise-eyebrow', '請將以下中文組成日文'));
+    prompt.appendChild(element('p', 'exercise-prompt-text', exercise.prompt));
+    exercisePanel.appendChild(prompt);
+
+    var builder = element('section', 'exercise-builder');
+    var builderHeading = element('div', 'exercise-section-heading');
+    builderHeading.appendChild(element('h3', '', '目前組成的句子'));
+    builderHeading.appendChild(element('span', '', '依序選擇積木'));
+    builder.appendChild(builderHeading);
+    var sentence = element('div', 'sentence-pieces');
+    modules.forEach(function (module) {
+      var selected = selectedExerciseAnswers[module.id];
+      if (selected) {
+        var piece = action(selected, function () {
+          delete selectedExerciseAnswers[module.id];
+          exerciseResult = null;
+          renderExamples();
+        }, 'sentence-piece');
+        piece.setAttribute('aria-label', '移除' + selected);
+        sentence.appendChild(piece);
+      } else {
+        sentence.appendChild(element('span', 'sentence-piece is-empty', '＋'));
+      }
+    });
+    builder.appendChild(sentence);
+    if (assembled) builder.appendChild(element('p', 'assembled-reading', assembled));
+    exercisePanel.appendChild(builder);
+
+    var modulesHeading = element('div', 'exercise-section-heading');
+    modulesHeading.appendChild(element('h3', '', '選擇語言模塊'));
+    exercisePanel.appendChild(modulesHeading);
+    var moduleGrid = element('div', 'exercise-module-grid');
+    modules.forEach(function (module) {
+      var moduleCard = element('section', 'exercise-module');
+      moduleCard.appendChild(element('h4', '', module.label));
+      var options = element('div', 'exercise-options');
+      (module.options || []).forEach(function (option) {
+        var optionButton = action(option, function () {
+          selectedExerciseAnswers[module.id] = option;
+          exerciseResult = null;
+          renderExamples();
+        }, 'exercise-option');
+        optionButton.setAttribute('aria-pressed', selectedExerciseAnswers[module.id] === option ? 'true' : 'false');
+        options.appendChild(optionButton);
+      });
+      moduleCard.appendChild(options);
+      moduleGrid.appendChild(moduleCard);
+    });
+    exercisePanel.appendChild(moduleGrid);
+
+    var actions = element('div', 'exercise-actions');
+    var confirm = action('確認答案', function () {
+      var correct = modules.every(function (module) {
+        return selectedExerciseAnswers[module.id] === module.correct;
+      });
+      exerciseResult = { correct: correct };
+      renderExamples();
+    }, 'btn');
+    confirm.disabled = !complete;
+    actions.appendChild(confirm);
+    var reset = action('清除重組', function () {
+      selectedExerciseAnswers = {};
+      exerciseResult = null;
+      renderExamples();
+    }, 'btn ghost');
+    actions.appendChild(reset);
+    exercisePanel.appendChild(actions);
+
+    if (exerciseResult) {
+      var feedback = element('div', 'exercise-feedback ' + (exerciseResult.correct ? 'is-correct' : 'is-incorrect'));
+      feedback.setAttribute('role', 'status');
+      feedback.setAttribute('aria-live', 'polite');
+      feedback.appendChild(element('strong', '', exerciseResult.correct ? '答對了！' : '再試一次，這是正確答案：'));
+      feedback.appendChild(element('p', 'exercise-answer', exercise.answer));
+      if (exercise.explanation) feedback.appendChild(element('p', 'exercise-explanation', exercise.explanation));
+      var playAnswer = speakerButton('朗讀正確答案', function () { speakJapaneseList([exercise.answer]); }, 'exercise-audio');
+      playAnswer.disabled = !('speechSynthesis' in window);
+      feedback.appendChild(playAnswer);
+      exercisePanel.appendChild(feedback);
+    }
+
+    content.appendChild(exercisePanel);
   }
 
   function renderExamples() {
     heading.textContent = '課堂與生活例句';
     content.innerHTML = '';
+    renderExampleModeTabs();
+    if (selectedExampleMode === 'exercise') {
+      renderSentenceExercise();
+      return;
+    }
     var filters = [{ id: 'all', label: '全部' }, { id: 'life', label: '生活造句' }, { id: 'ndesu', label: 'んです' }].concat(
       grammar.categories.map(function (item) { return { id: item.id, label: item.label }; })
     );
@@ -322,13 +500,14 @@
     if (!active) return;
     selectedNdesuGroup = active.id;
     active.rows.forEach(function (row) {
+      var reading = Array.isArray(row) ? row[6] : row.reading;
+      var forms = Array.isArray(row) ? [row[1], row[2], row[3], row[4]].map(function (form) { return form + 'んです'; }) : row.forms;
       var tr = document.createElement('tr'), base = document.createElement('td');
-      base.appendChild(element('span', 'row-word', row[6]));
-      base.appendChild(speakerButton('播放' + row[6], function () { speakJapaneseList([row[6]]); }));
+      base.appendChild(element('span', 'row-word', reading));
+      base.appendChild(speakerButton('播放' + reading, function () { speakJapaneseList([reading]); }));
       tr.appendChild(base);
-      for (var index = 1; index <= 4; index++) {
+      forms.forEach(function (answer) {
         var td = document.createElement('td');
-        var answer = row[index] + 'んです';
         var reveal = element('button', 'cell-button');
         reveal.type = 'button';
         reveal.innerHTML = '<span class="masked">點一下顯示</span>';
@@ -341,10 +520,10 @@
             button.setAttribute('aria-label', '播放' + target);
             speakJapaneseList([dictionaryReading, target]);
           };
-        }(answer, reveal, row[6]));
+        }(answer, reveal, reading));
         td.appendChild(reveal);
         tr.appendChild(td);
-      }
+      });
       tbody.appendChild(tr);
     });
   }
@@ -354,8 +533,10 @@
       if (!group) return;
       var readings = [];
       group.rows.forEach(function (row) {
-        if (column === 0) readings.push(row[6]);
-        else readings.push(row[6], row[column] + 'んです');
+        var reading = Array.isArray(row) ? row[6] : row.reading;
+        var forms = Array.isArray(row) ? [row[1], row[2], row[3], row[4]].map(function (form) { return form + 'んです'; }) : row.forms;
+        if (column === 0) readings.push(reading);
+        else readings.push(reading, forms[column - 1]);
       });
       speakJapaneseList(readings);
     });
