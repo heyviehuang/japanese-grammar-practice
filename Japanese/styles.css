@@ -4,12 +4,16 @@
   --surface: #3a383c;
   --surface-raised: #545157;
   --surface-soft: #6B686E;
-  --ink: #fbfad7;
+  --ink: #fffef0;
   --muted: #e1dac3;
   --accent: #e4e2e0;
   --accent-soft: #b2ac97;
   --accent-ink: #4E4B51;
   --accent-line: rgba(237, 232, 214, 0.72);
+  --heading-main: #f6ebcc;
+  --heading-section: #f9ddf2;
+  --supporting-text: #C9C4D3;
+  --annotation-text: #D2CDBB;
   --line: rgba(244, 238, 216, .2);
   --page-line: rgba(244, 238, 216, .28);
   box-sizing: border-box;
@@ -106,9 +110,9 @@ body {
 .study-head h1,
 h1 {
   margin: 0;
-  color: var(--accent);
+  color: var(--heading-main);
   font-family: "Shippori Mincho", "Hiragino Mincho ProN", "Noto Serif TC", serif;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: clamp(1.65rem, 3.5vw, 2.2rem);
   font-weight: 500;
   letter-spacing: .045em;
   line-height: 1.35;
@@ -142,12 +146,32 @@ h1 {
 #end,
 .card {
   position: relative;
-  padding: 22px;
-  /* border: 1px solid var(--page-line); */
   border-radius: 4px;
-  background: var(--surface);
   color: var(--ink);
   box-shadow: none;
+}
+
+#study-modes .chip,
+#categories .chip,
+.conjugation-filters .chip {
+  border: 1px solid var(--accent-line);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--accent);
+  font-size: .86rem;
+  font-weight: 500;
+  padding: 7px 13px;
+}
+
+#study-modes .chip[aria-pressed="true"],
+#categories .chip[aria-pressed="true"],
+#categories .chip[aria-selected="true"],
+.conjugation-filters .chip[aria-pressed="true"],
+.conjugation-filters .chip[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
 }
 
 /* 類別標籤 */
@@ -297,7 +321,8 @@ button:disabled,
 }
 
 .study-table {
-  min-width: 1610px;
+  width: max-content;
+  min-width: 0;
 }
 
 .study-table col:first-child {
@@ -325,8 +350,10 @@ button:disabled,
   top: 0;
   z-index: 2;
   background: var(--surface-soft);
-  color: var(--ink);
+  color: var(--heading-main);
+  font-size: 1.05rem;
   font-weight: 700;
+  letter-spacing: .025em;
   line-height: 1.4;
   white-space: normal;
 }
@@ -346,7 +373,7 @@ button:disabled,
 .conjugation-table th:first-child {
   z-index: 5;
   background: var(--surface-soft);
-  color: var(--ink);
+  color: var(--heading-main);
 }
 
 .study-table td:first-child,
@@ -404,6 +431,8 @@ button:disabled,
 .study-table td:first-child .row-word,
 .conjugation-table td:first-child .row-word {
   display: block;
+  color: var(--heading-main);
+  font-weight: 700;
   text-align: center;
 }
 
@@ -478,6 +507,13 @@ button:disabled,
   transition: background .18s ease, border-color .18s ease;
 }
 
+.pattern-card strong {
+  color: var(--heading-main);
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
 .pattern-card:hover {
   border-color: var(--accent);
   background: #66636A;
@@ -486,7 +522,7 @@ button:disabled,
 .pattern-group,
 .lesson-tags,
 .example-tags {
-  color: var(--muted);
+  color: var(--supporting-text);
   font-size: .82rem;
 }
 
@@ -505,11 +541,13 @@ button:disabled,
 
 .lesson-detail h2 {
   margin: 10px 0 4px;
+  color: var(--heading-main);
 }
 
 .lesson-detail h3,
 .reference-title {
   margin: 22px 0 8px;
+  color: var(--heading-section);
   font-size: 1.05rem;
 }
 
@@ -529,8 +567,12 @@ button:disabled,
 .lesson-notes {
   margin: 0 0 18px;
   padding-left: 1.4em;
-  color: var(--muted);
+  color: var(--annotation-text);
   line-height: 1.7;
+}
+
+.lesson-detail h3 {
+  color: var(--heading-section);
 }
 
 .reference-scroll {
@@ -621,14 +663,14 @@ button:disabled,
 }
 
 .example-chinese {
-  color: var(--muted);
+  color: var(--annotation-text);
 }
 
 .example-note,
 .example-source {
   display: block;
   margin-top: 8px;
-  color: var(--muted);
+  color: var(--supporting-text);
   font-size: .86rem;
 }
 
@@ -835,10 +877,6 @@ input[type="text"]:focus {
   .category-tabs .chip {
     padding: 6px 9px;
     font-size: .78rem;
-  }
-
-  .study-table {
-    min-width: 1450px;
   }
 
   .study-table col:first-child {
