@@ -634,7 +634,8 @@ button:disabled,
   margin: 0;
 }
 
-.example-audio {
+.example-audio,
+.example-practice {
   display: inline-flex;
   flex: 0 0 34px;
   align-items: center;
@@ -649,12 +650,14 @@ button:disabled,
   cursor: pointer;
 }
 
-.example-audio svg {
+.example-audio svg,
+.example-practice svg {
   width: 18px;
   height: 18px;
 }
 
-.example-audio:hover {
+.example-audio:hover,
+.example-practice:hover {
   background: var(--surface-soft);
 }
 

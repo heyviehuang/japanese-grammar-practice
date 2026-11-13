@@ -31,8 +31,13 @@ If the web app was already deployed, use **Deploy → Manage deployments**, edit
   | example-002 | te-form | 動詞て形 | 1 | 疲れていて | 疲れていて\|疲れて\|疲れていた |
   | example-002 | grammar | 文法接續 | 2 | も | も\|から\|が |
   | example-002 | verb | 動詞變化 | 3 | 勉強します。 | 勉強します。\|勉強しました。\|勉強しています。 |
+- To add another sentence to the optional word-piece assembly practice:
+  1. Add its Japanese sentence and Chinese prompt once in `Examples`. Keep the generated `exampleId`.
+  2. Add one row per sentence piece in `SentenceExerciseModules`, repeating that `exampleId` on every row. Use `moduleOrder` to set the assembly order and a distinct `moduleId` for each piece in that exercise.
+  3. Enter the correct piece in `correctOption` and include that exact text among the `options` separated by `|`. The correct pieces in order should form the Japanese sentence in `Examples`.
+  4. Save the sheet and refresh the website. Its example card will show the heart icon for opening the word-piece assembly exercise.
 - Keep IDs on existing rows unchanged. To link an example to a grammar item, copy its generated `patternId` into `patternIds`; separate multiple IDs with `|`. Enter the sentence and translation only once in `Examples`.
-- After pasting multiple rows, if any IDs remain blank, reload the sheet and select **日文文法筆記 → 補齊空白 ID**. Repeat the same `exampleId` in each module row belonging to that sentence. Examples without module rows remain in the example list and are not offered as practice questions.
+- After pasting multiple rows, if any IDs remain blank, reload the sheet and select **日文文法筆記 → 補齊空白 ID**. Repeat the same `exampleId` in each module row belonging to that sentence. Examples without module rows stay in the example list and do not show the practice icon.
 - For ordinary content edits, save the sheet and refresh the website. No Git push is needed.
 
 ## 3. Point the website to the endpoint

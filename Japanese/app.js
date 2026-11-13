@@ -152,6 +152,23 @@
     var audioButton = speakerButton('朗讀日文例句與中文翻譯', function () { speakExample(example); }, 'example-audio');
     audioButton.disabled = !('speechSynthesis' in window);
     topLine.appendChild(audioButton);
+    var linkedExercise = sentenceExercises().find(function (item) {
+      return item.id === example.id || (!example.id && item.answer === example.japanese);
+    });
+    if (linkedExercise) {
+      var practiceButton = action('', function () {
+        stopSpeech();
+        selectedExampleMode = 'exercise';
+        selectedExerciseId = linkedExercise.id;
+        selectedExerciseAnswers = {};
+        exerciseResult = null;
+        setPage('examples');
+      }, 'example-practice');
+      practiceButton.setAttribute('aria-label', '用這句進行詞塊拼句練習');
+      practiceButton.title = '用這句進行詞塊拼句練習';
+      practiceButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.1 10.55 18.8C5.4 14.12 2 11.03 2 7.25 2 4.16 4.42 1.75 7.5 1.75c1.74 0 3.41.81 4.5 2.08 1.09-1.27 2.76-2.08 4.5-2.08 3.08 0 5.5 2.41 5.5 5.5 0 3.78-3.4 6.87-8.55 11.56L12 20.1Z" transform="translate(0 1)" fill="currentColor"/></svg>';
+      topLine.appendChild(practiceButton);
+    }
     block.appendChild(topLine);
     block.appendChild(element('p', 'example-chinese', example.chinese));
     var tags = (example.patternIds || []).map(pattern).filter(Boolean).map(function (item) { return item.name; });
@@ -159,18 +176,6 @@
     if (tags.length) block.appendChild(element('small', 'example-tags', '標籤：' + tags.join('、')));
     if (example.note) block.appendChild(element('p', 'example-note', example.note));
     if (example.source) block.appendChild(element('small', 'example-source', example.source));
-    var linkedExercise = sentenceExercises().find(function (item) {
-      return item.id === example.id || (!example.id && item.answer === example.japanese);
-    });
-    if (linkedExercise) {
-      block.appendChild(action('用這句練習組句', function () {
-        selectedExampleMode = 'exercise';
-        selectedExerciseId = linkedExercise.id;
-        selectedExerciseAnswers = {};
-        exerciseResult = null;
-        renderExamples();
-      }, 'btn ghost practice-example-button'));
-    }
     return block;
   }
 
@@ -186,10 +191,11 @@
     var tabs = element('nav', 'example-modes category-tabs');
     tabs.setAttribute('aria-label', '例句頁面內容');
     tabs.setAttribute('role', 'tablist');
-    [
+    var modes = [
       { id: 'list', label: '例句列表' },
       { id: 'exercise', label: '組句練習' }
-    ].forEach(function (mode) {
+    ];
+    modes.forEach(function (mode) {
       var button = action(mode.label, function () {
         stopSpeech();
         selectedExampleMode = mode.id;
