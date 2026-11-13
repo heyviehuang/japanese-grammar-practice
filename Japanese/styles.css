@@ -804,7 +804,7 @@ button:disabled,
 
 .exercise-module-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -902,7 +902,7 @@ button:disabled,
 
 @media (max-width: 800px) {
   .exercise-module-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 }
 
@@ -1096,10 +1096,6 @@ input[type="text"]:focus {
 
   .study-head {
     margin: 12px 0 18px;
-  }
-
-  .study-panel {
-    padding: 15px 12px;
   }
 
   .category-tabs {
