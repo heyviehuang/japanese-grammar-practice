@@ -8,6 +8,7 @@
   var selectedCategory = 'te-form';
   var selectedExampleCategory = 'all';
   var selectedExampleMode = 'list';
+  var favoriteExampleIds = loadFavoriteExampleIds();
   var selectedExerciseId = null;
   var selectedExerciseAnswers = {};
   var exerciseResult = null;
@@ -90,7 +91,17 @@
   function renderGrammar() {
     heading.textContent = '文法筆記';
     content.innerHTML = '';
-    var categories = element('div', 'review-categories');
+    var patterns = grammar.patterns.filter(function (item) {
+      return selectedCategory === 'all' || item.category === selectedCategory || item.tags.indexOf(selectedCategory) >= 0;
+    });
+    if (!patterns.some(function (item) { return item.id === selectedPattern; })) {
+      selectedPattern = patterns.length ? patterns[0].id : null;
+    }
+
+    var layout = element('div', 'grammar-layout');
+    var sidebar = element('aside', 'grammar-sidebar');
+    sidebar.appendChild(element('h2', 'grammar-sidebar-title', '文法分類'));
+    var categories = element('div', 'review-categories grammar-categories');
     grammar.categories.forEach(function (item) {
       var button = action(item.label, function () { selectedCategory = item.id; selectedPattern = null; renderGrammar(); }, 'chip');
       button.setAttribute('aria-pressed', selectedCategory === item.id ? 'true' : 'false');
@@ -99,23 +110,27 @@
     var allButton = action('全部', function () { selectedCategory = 'all'; selectedPattern = null; renderGrammar(); }, 'chip');
     allButton.setAttribute('aria-pressed', selectedCategory === 'all' ? 'true' : 'false');
     categories.appendChild(allButton);
-    content.appendChild(categories);
+    sidebar.appendChild(categories);
 
-    if (selectedPattern) {
-      renderPatternDetail(selectedPattern);
-      return;
-    }
-    var list = element('div', 'pattern-grid');
-    grammar.patterns.filter(function (item) { return selectedCategory === 'all' || item.category === selectedCategory || item.tags.indexOf(selectedCategory) >= 0; }).forEach(function (item) {
-      var card = action('', function () { selectedPattern = item.id; renderGrammar(); }, 'pattern-card');
-      var title = element('strong', '', item.name);
+    var list = element('div', 'grammar-pattern-list');
+    patterns.forEach(function (item) {
+      var card = action('', function () { selectedPattern = item.id; renderGrammar(); }, 'grammar-list-item');
+      card.setAttribute('aria-pressed', selectedPattern === item.id ? 'true' : 'false');
+      card.setAttribute('aria-current', selectedPattern === item.id ? 'true' : 'false');
+      card.appendChild(element('strong', '', item.name));
       var group = category(item.category);
-      card.appendChild(title);
       card.appendChild(element('span', 'pattern-group', group ? group.label : '條件句型'));
-      card.appendChild(element('span', 'pattern-connect', item.connection));
+      if (item.connection) card.appendChild(element('span', 'grammar-list-connection', item.connection));
       list.appendChild(card);
     });
-    content.appendChild(list);
+    sidebar.appendChild(list);
+    layout.appendChild(sidebar);
+
+    var detailPane = element('section', 'grammar-detail-pane');
+    if (selectedPattern) renderPatternDetail(selectedPattern, detailPane);
+    else detailPane.appendChild(element('p', 'empty-state', '目前沒有這個分類的文法內容。'));
+    layout.appendChild(detailPane);
+    content.appendChild(layout);
   }
 
   function allExamples() {
@@ -145,6 +160,27 @@
     return uniqueItems;
   }
 
+  function loadFavoriteExampleIds() {
+    try {
+      var stored = JSON.parse(window.localStorage.getItem('japanese-grammar-favorites-v1') || '[]');
+      return Array.isArray(stored) ? stored : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function exampleFavoriteId(example) {
+    return String(example.id || example.japanese || '');
+  }
+
+  function isExampleFavorite(example) {
+    return favoriteExampleIds.indexOf(exampleFavoriteId(example)) >= 0;
+  }
+
+  function saveFavoriteExampleIds() {
+    try { window.localStorage.setItem('japanese-grammar-favorites-v1', JSON.stringify(favoriteExampleIds)); } catch (error) {}
+  }
+
   function makeExampleCard(example) {
     var block = element('article', 'example-item');
     var topLine = element('div', 'example-topline');
@@ -152,6 +188,27 @@
     var audioButton = speakerButton('朗讀日文例句與中文翻譯', function () { speakExample(example); }, 'example-audio');
     audioButton.disabled = !('speechSynthesis' in window);
     topLine.appendChild(audioButton);
+    var favoriteButton = action('', function () {
+      var favoriteId = exampleFavoriteId(example);
+      var favoriteIndex = favoriteExampleIds.indexOf(favoriteId);
+      if (favoriteIndex >= 0) favoriteExampleIds.splice(favoriteIndex, 1);
+      else favoriteExampleIds.push(favoriteId);
+      saveFavoriteExampleIds();
+      var favorite = isExampleFavorite(example);
+      favoriteButton.setAttribute('aria-pressed', favorite ? 'true' : 'false');
+      favoriteButton.setAttribute('aria-label', favorite ? '取消收藏例句' : '收藏例句');
+      favoriteButton.title = favorite ? '取消收藏例句' : '收藏例句';
+      if (selectedExampleCategory === 'favorites') {
+        stopSpeech();
+        renderExamples();
+      }
+    }, 'example-favorite');
+    var isFavorite = isExampleFavorite(example);
+    favoriteButton.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+    favoriteButton.setAttribute('aria-label', isFavorite ? '取消收藏例句' : '收藏例句');
+    favoriteButton.title = isFavorite ? '取消收藏例句' : '收藏例句';
+    favoriteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.1 10.55 18.8C5.4 14.12 2 11.03 2 7.25 2 4.16 4.42 1.75 7.5 1.75c1.74 0 3.41.81 4.5 2.08 1.09-1.27 2.76-2.08 4.5-2.08 3.08 0 5.5 2.41 5.5 5.5 0 3.78-3.4 6.87-8.55 11.56L12 20.1Z" transform="translate(0 1)" fill="currentColor"/></svg>';
+    topLine.appendChild(favoriteButton);
     var linkedExercise = sentenceExercises().find(function (item) {
       return item.id === example.id || (!example.id && item.answer === example.japanese);
     });
@@ -166,7 +223,7 @@
       }, 'example-practice');
       practiceButton.setAttribute('aria-label', '用這句進行詞塊拼句練習');
       practiceButton.title = '用這句進行詞塊拼句練習';
-      practiceButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.1 10.55 18.8C5.4 14.12 2 11.03 2 7.25 2 4.16 4.42 1.75 7.5 1.75c1.74 0 3.41.81 4.5 2.08 1.09-1.27 2.76-2.08 4.5-2.08 3.08 0 5.5 2.41 5.5 5.5 0 3.78-3.4 6.87-8.55 11.56L12 20.1Z" transform="translate(0 1)" fill="currentColor"/></svg>';
+      practiceButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h5a3 3 0 1 1 6 0h5v5a3 3 0 1 0 0 6v5h-5a3 3 0 1 1-6 0H4v-5a3 3 0 1 0 0-6V4Z" fill="currentColor"/></svg>';
       topLine.appendChild(practiceButton);
     }
     block.appendChild(topLine);
@@ -322,7 +379,7 @@
       renderSentenceExercise();
       return;
     }
-    var filters = [{ id: 'all', label: '全部' }, { id: 'life', label: '生活造句' }, { id: 'ndesu', label: 'んです' }].concat(
+    var filters = [{ id: 'all', label: '全部' }, { id: 'favorites', label: '收藏' }, { id: 'life', label: '生活造句' }, { id: 'ndesu', label: 'んです' }].concat(
       grammar.categories.map(function (item) { return { id: item.id, label: item.label }; })
     );
     var tabs = element('div', 'review-categories');
@@ -334,6 +391,7 @@
     content.appendChild(tabs);
     var items = allExamples().filter(function (example) {
       if (selectedExampleCategory === 'all') return true;
+      if (selectedExampleCategory === 'favorites') return isExampleFavorite(example);
       if (selectedExampleCategory === 'life') return (example.tags || []).some(function (tag) { return tag.indexOf('生活造句') >= 0 || tag.indexOf('生活日文') >= 0; });
       if (selectedExampleCategory === 'ndesu') return (example.tags || []).indexOf('んです') >= 0;
       return (example.patternIds || []).some(function (id) {
@@ -352,6 +410,7 @@
     content.appendChild(playbackControls);
     var list = element('div', 'example-list');
     items.forEach(function (example) { list.appendChild(makeExampleCard(example)); });
+    if (!items.length) list.appendChild(element('p', 'empty-state', selectedExampleCategory === 'favorites' ? '還沒有收藏的例句。' : '這個分類目前沒有例句。'));
     content.appendChild(list);
   }
 
@@ -364,11 +423,10 @@
     });
     table.appendChild(body); tableWrap.appendChild(table); parent.appendChild(tableWrap);
   }
-  function renderPatternDetail(id) {
+  function renderPatternDetail(id, parent) {
     var item = pattern(id);
     if (!item) return;
     var panel = element('article', 'lesson-detail');
-    panel.appendChild(action('← 返回文法列表', function () { selectedPattern = null; renderGrammar(); }, 'btn ghost back-button'));
     panel.appendChild(element('h2', '', item.name));
     var labels = [category(item.category)].concat(item.tags.map(category)).filter(Boolean);
     panel.appendChild(element('p', 'lesson-tags', labels.map(function (x) { return x.label; }).join(' ・ ')));
@@ -396,7 +454,7 @@
     var exampleList = element('div', 'example-list');
     examples.forEach(function (example) { exampleList.appendChild(makeExampleCard(example)); });
     panel.appendChild(exampleList);
-    content.appendChild(panel);
+    parent.appendChild(panel);
   }
 
   function stopSpeech() {
