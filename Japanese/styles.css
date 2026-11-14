@@ -117,7 +117,7 @@ body {
 
 /* 頁面標題與狀態 */
 .study-wrap {
-  padding: 24px 0 58px;
+  padding: 24px 0 82px;
 }
 
 .study-head {
@@ -680,47 +680,143 @@ button:disabled,
 /* 例句與朗讀 */
 .example-list {
   display: grid;
-  gap: 10px;
+  gap: 5px;
 }
 
 .example-item {
-  padding: 12px 14px;
+  position: relative;
+  padding: 8px 14px 36px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface);
 }
 
 .example-playback-controls {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 30;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin: 0 0 14px;
+  margin: 0;
+}
+
+.cycle-read-button {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-color: var(--accent-line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 0;
+}
+
+.cycle-read-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cycle-read-button.is-playing {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.example-filter-menu {
+  min-width: 0;
+  margin: 0 0 16px;
+}
+
+.example-filter-summary {
+  display: flex;
+  width: auto;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 13px;
+  border: 1px solid var(--page-line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.example-filter-summary::-webkit-details-marker {
+  display: none;
+}
+
+.example-filter-summary::after {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-right: 1.5px solid var(--accent);
+  border-bottom: 1.5px solid var(--accent);
+  content: "";
+  transform: rotate(45deg) translateY(-2px);
+}
+
+.example-filter-menu[open] .example-filter-summary::after {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+.example-filter-summary strong {
+  margin-left: auto;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.example-filter-menu[open] .example-filter-summary {
+  border-color: var(--accent);
+  border-radius: 10px 10px 0 0;
+}
+
+.example-category-options {
+  min-width: 0;
+  box-sizing: border-box;
+  gap: 7px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  background: var(--surface);
+  overflow: visible;
 }
 
 .example-topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  display: block;
 }
 
 .example-topline .example-japanese {
-  flex: 1;
   min-width: 0;
   margin: 0;
+}
+
+.example-actions {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .example-audio,
 .example-practice,
 .example-favorite {
   display: inline-flex;
-  flex: 0 0 34px;
+  flex: 0 0 22px;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 3px;
   border: 1px solid var(--page-line);
   border-radius: 50%;
   background: var(--surface);
@@ -731,8 +827,8 @@ button:disabled,
 .example-audio svg,
 .example-practice svg,
 .example-favorite svg {
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
 }
 
 .example-audio:hover,
@@ -754,10 +850,13 @@ button:disabled,
 }
 
 .example-chinese {
+  margin: 6px 0;
   color: var(--example-translation-color);
 }
 
 .example-tags {
+  display: inline-block;
+  margin-top: 3px;
   color: var(--example-label-color);
   font-size: .82rem;
 }
@@ -765,7 +864,7 @@ button:disabled,
 .example-note,
 .example-source {
   display: block;
-  margin-top: 8px;
+  margin-top: 4px;
   color: var(--supporting-text);
   font-size: .86rem;
 }
@@ -1196,7 +1295,11 @@ input[type="text"]:focus {
   }
 
   .study-wrap {
-    padding: 18px 0 36px;
+    padding: 18px 0 74px;
+  }
+
+  .data-status {
+    padding: 10px 13px;
   }
 
   .study-panel {
@@ -1209,6 +1312,47 @@ input[type="text"]:focus {
 
   .lesson-detail {
     padding: 16px 13px;
+  }
+
+  .example-topline {
+    display: block;
+  }
+
+  .example-item {
+    padding: 8px 12px 34px;
+  }
+
+  .example-actions {
+    right: 8px;
+    bottom: 6px;
+    gap: 3px;
+  }
+
+  .example-audio,
+  .example-favorite,
+  .example-practice {
+    flex-basis: 22px;
+    width: 22px;
+    height: 22px;
+    padding: 3px;
+  }
+
+  .example-audio svg,
+  .example-favorite svg,
+  .example-practice svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .cycle-read-button {
+    width: 32px;
+    height: 32px;
+    padding: 5px;
+  }
+
+  .example-playback-controls {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
   }
 
   .study-head {

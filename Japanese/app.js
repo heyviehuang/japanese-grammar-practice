@@ -185,9 +185,10 @@
     var block = element('article', 'example-item');
     var topLine = element('div', 'example-topline');
     topLine.appendChild(element('p', 'example-japanese', example.japanese));
+    var exampleActions = element('div', 'example-actions');
     var audioButton = speakerButton('朗讀日文例句與中文翻譯', function () { speakExample(example); }, 'example-audio');
     audioButton.disabled = !('speechSynthesis' in window);
-    topLine.appendChild(audioButton);
+    exampleActions.appendChild(audioButton);
     var favoriteButton = action('', function () {
       var favoriteId = exampleFavoriteId(example);
       var favoriteIndex = favoriteExampleIds.indexOf(favoriteId);
@@ -208,7 +209,7 @@
     favoriteButton.setAttribute('aria-label', isFavorite ? '取消收藏例句' : '收藏例句');
     favoriteButton.title = isFavorite ? '取消收藏例句' : '收藏例句';
     favoriteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.1 10.55 18.8C5.4 14.12 2 11.03 2 7.25 2 4.16 4.42 1.75 7.5 1.75c1.74 0 3.41.81 4.5 2.08 1.09-1.27 2.76-2.08 4.5-2.08 3.08 0 5.5 2.41 5.5 5.5 0 3.78-3.4 6.87-8.55 11.56L12 20.1Z" transform="translate(0 1)" fill="currentColor"/></svg>';
-    topLine.appendChild(favoriteButton);
+    exampleActions.appendChild(favoriteButton);
     var linkedExercise = sentenceExercises().find(function (item) {
       return item.id === example.id || (!example.id && item.answer === example.japanese);
     });
@@ -224,8 +225,9 @@
       practiceButton.setAttribute('aria-label', '用這句進行詞塊拼句練習');
       practiceButton.title = '用這句進行詞塊拼句練習';
       practiceButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h5a3 3 0 1 1 6 0h5v5a3 3 0 1 0 0 6v5h-5a3 3 0 1 1-6 0H4v-5a3 3 0 1 0 0-6V4Z" fill="currentColor"/></svg>';
-      topLine.appendChild(practiceButton);
+      exampleActions.appendChild(practiceButton);
     }
+    topLine.appendChild(exampleActions);
     block.appendChild(topLine);
     block.appendChild(element('p', 'example-chinese', example.chinese));
     var tags = (example.patternIds || []).map(pattern).filter(Boolean).map(function (item) { return item.name; });
@@ -382,13 +384,20 @@
     var filters = [{ id: 'all', label: '全部' }, { id: 'favorites', label: '收藏' }, { id: 'life', label: '生活造句' }, { id: 'ndesu', label: 'んです' }].concat(
       grammar.categories.map(function (item) { return { id: item.id, label: item.label }; })
     );
-    var tabs = element('div', 'review-categories');
+    var currentFilter = filters.filter(function (filter) { return filter.id === selectedExampleCategory; })[0] || filters[0];
+    var filterMenu = element('details', 'example-filter-menu');
+    var filterSummary = element('summary', 'example-filter-summary');
+    filterSummary.appendChild(element('span', '', '例句分類'));
+    filterSummary.appendChild(element('strong', '', currentFilter.label));
+    filterMenu.appendChild(filterSummary);
+    var tabs = element('div', 'review-categories example-category-options');
     filters.forEach(function (filter) {
       var button = action(filter.label, function () { stopSpeech(); selectedExampleCategory = filter.id; renderExamples(); }, 'chip');
       button.setAttribute('aria-pressed', selectedExampleCategory === filter.id ? 'true' : 'false');
       tabs.appendChild(button);
     });
-    content.appendChild(tabs);
+    filterMenu.appendChild(tabs);
+    content.appendChild(filterMenu);
     var items = allExamples().filter(function (example) {
       if (selectedExampleCategory === 'all') return true;
       if (selectedExampleCategory === 'favorites') return isExampleFavorite(example);
@@ -400,12 +409,12 @@
       });
     });
     var playbackControls = element('div', 'example-playback-controls');
-    var cycleButton = action('循環朗讀本類別', function () {
+    var cycleButton = action('', function () {
       if (categoryPlaybackButton === cycleButton) { stopSpeech(); return; }
       startCategoryPlayback(items, cycleButton);
-    }, 'btn ghost');
+    }, 'btn ghost cycle-read-button');
     cycleButton.disabled = items.length === 0 || !('speechSynthesis' in window);
-    cycleButton.setAttribute('aria-label', '依序朗讀目前分類的所有例句');
+    setCycleButtonState(cycleButton, false);
     playbackControls.appendChild(cycleButton);
     content.appendChild(playbackControls);
     var list = element('div', 'example-list');
@@ -461,9 +470,17 @@
     speechSessionId += 1;
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     if (categoryPlaybackButton) {
-      categoryPlaybackButton.textContent = '循環朗讀本類別';
+      setCycleButtonState(categoryPlaybackButton, false);
       categoryPlaybackButton = null;
     }
+  }
+  function setCycleButtonState(button, playing) {
+    button.innerHTML = playing
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.6 9A7 7 0 0 1 18 6l2 2M4 16l2 2a7 7 0 0 0 12.4-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    button.setAttribute('aria-label', playing ? '停止循環朗讀' : '依序朗讀目前分類的所有例句');
+    button.title = playing ? '停止循環朗讀' : '循環朗讀本類別';
+    button.classList.toggle('is-playing', playing);
   }
   function speechVoice(lang) {
     if (!('speechSynthesis' in window)) return null;
@@ -529,11 +546,11 @@
     var sessionId = speechSessionId;
     var index = 0;
     categoryPlaybackButton = button;
-    button.textContent = '停止朗讀';
+    setCycleButtonState(button, true);
     function playNextExample() {
       if (sessionId !== speechSessionId) return;
       if (index >= examples.length) {
-        button.textContent = '循環朗讀本類別';
+        setCycleButtonState(button, false);
         categoryPlaybackButton = null;
         return;
       }
