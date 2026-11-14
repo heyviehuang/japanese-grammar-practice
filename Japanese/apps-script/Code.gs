@@ -167,6 +167,7 @@ function readNotebookData_() {
     return {
       dictionary: row.dictionary,
       reading: row.reading,
+      meaning: row.meaning || '',
       type: row.type,
       forms: forms
     };

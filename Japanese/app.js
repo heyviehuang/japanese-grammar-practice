@@ -580,7 +580,7 @@
     conjugationContent.appendChild(scrollTools);
     var table = element('table', 'study-table');
     var colgroup = document.createElement('colgroup');
-    for (var col = 0; col < 9; col++) colgroup.appendChild(document.createElement('col'));
+    for (var col = 0; col < 10; col++) colgroup.appendChild(document.createElement('col'));
     table.appendChild(colgroup);
     var forms = [
       { id: 'masu', label: 'ます形' }, { id: 'te', label: 'て形' },
@@ -602,6 +602,10 @@
       }, 'column-speaker'));
       header.appendChild(th);
     });
+    var meaningHeader = document.createElement('th');
+    meaningHeader.scope = 'col';
+    meaningHeader.textContent = '中文意思';
+    header.appendChild(meaningHeader);
     thead.appendChild(header); table.appendChild(thead);
     var tbody = document.createElement('tbody');
     rows.forEach(function (row) {
@@ -621,6 +625,7 @@
         reveal.setAttribute('aria-label', '顯示並播放' + kind.label);
         td.appendChild(reveal); tr.appendChild(td);
       });
+      tr.appendChild(element('td', 'verb-meaning', row.meaning || ''));
       tbody.appendChild(tr);
     });
     table.appendChild(tbody); tableWrap.appendChild(table); conjugationContent.appendChild(tableWrap);
