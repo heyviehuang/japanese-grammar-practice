@@ -270,7 +270,9 @@
 
   function renderSentenceExercise() {
     var exercises = sentenceExercises();
-    var exercise = exercises.filter(function (item) { return item.id === selectedExerciseId; })[0] || exercises[0];
+    var exerciseIndex = exercises.findIndex(function (item) { return item.id === selectedExerciseId; });
+    if (exerciseIndex < 0) exerciseIndex = 0;
+    var exercise = exercises[exerciseIndex];
     if (!exercise || !Array.isArray(exercise.modules) || !exercise.modules.length) {
       content.appendChild(element('p', 'empty-state', '目前還沒有組句練習題。'));
       return;
@@ -285,7 +287,27 @@
     titleGroup.appendChild(element('h2', '', '日文組句練習'));
     titleGroup.appendChild(element('p', '', '請選擇各語言模塊，組成完整句子。'));
     top.appendChild(titleGroup);
-    top.appendChild(element('span', 'exercise-progress', '01 / 01'));
+    var exerciseNavigation = element('div', 'exercise-navigation');
+    var previousExercise = action('上一題', function () {
+      selectedExerciseId = exercises[exerciseIndex - 1].id;
+      selectedExerciseAnswers = {};
+      exerciseResult = null;
+      renderExamples();
+    }, 'btn ghost exercise-nav-button');
+    previousExercise.disabled = exerciseIndex === 0;
+    previousExercise.setAttribute('aria-label', '上一題');
+    exerciseNavigation.appendChild(previousExercise);
+    exerciseNavigation.appendChild(element('span', 'exercise-progress', (exerciseIndex + 1) + ' / ' + exercises.length));
+    var nextExercise = action('下一題', function () {
+      selectedExerciseId = exercises[exerciseIndex + 1].id;
+      selectedExerciseAnswers = {};
+      exerciseResult = null;
+      renderExamples();
+    }, 'btn ghost exercise-nav-button');
+    nextExercise.disabled = exerciseIndex >= exercises.length - 1;
+    nextExercise.setAttribute('aria-label', '下一題');
+    exerciseNavigation.appendChild(nextExercise);
+    top.appendChild(exerciseNavigation);
     exercisePanel.appendChild(top);
 
     var prompt = element('section', 'exercise-prompt');
